@@ -97,5 +97,3 @@ For MySQL errors, ensure DB is running and MYSQL_CONN is set.
 
 
 ---
-
-Do you want me to also create a **`CONTRIBUTING.md`** (with branch/PR rules and coding style) to go along with this README, so your members know exactly how to work on features?
