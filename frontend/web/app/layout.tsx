@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
+import { AuthProvider } from "../hooks/use-auth"
 
 export const metadata: Metadata = {
   title: "Sherine_Travels",
@@ -21,7 +22,11 @@ html {
 }
         `}</style>
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
