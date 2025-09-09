@@ -9,6 +9,6 @@ namespace Sherine.Api.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         // Add future DbSets here (Vehicles, Bookings, etc)
-        // public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
     }
 }
