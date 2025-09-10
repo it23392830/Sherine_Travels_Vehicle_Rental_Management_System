@@ -25,46 +25,81 @@ const LoginForm: React.FC = () => {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
+     // Hardcoded manager & owner credentials
     const validCredentials = [
-      {
-      email: "manager@sherine.com",
-      password: "manager123",
-      redirect: "/dashboard/manager",
-    },
-
-    {
-        email: "owner@sherine.com",
-        password: "owner123",
-        redirect: "/dashboard/owner",
-    },
-  ]
+      { email: "manager@sherine.com", password: "manager123", redirect: "/dashboard/manager" },
+      { email: "owner@sherine.com", password: "owner123", redirect: "/dashboard/owner" },
+    ]
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     if (signIn) {
+      // Check Manager/Owner first
     const matchedUser = validCredentials.find(
       (cred) => cred.email === email && cred.password === password
     )
 
    if (matchedUser) {
       router.push(matchedUser.redirect) // redirect to role-based dashboard
-      } else {
+      } 
+      else {
+        /*Backend authentication simulation
+        try {
+          const res = await fetch("http://localhost:5000/api/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          })
+          const data = await res.json()
+
+          if (data.redirect) {
+            router.push(data.redirect)
+          } else {
+            setError(data.msg || "Invalid email or password.")
+          }
+        } catch {
+          setError("Server error. Please try again later.")
+        } */
+
         setError("Invalid email or password. Please try again.")
       }
 
     } else {
+      
       const name = formData.get("name") as string
       if (name && email && password) {
+         /*Sign Up for Users/Drivers
+         try {
+          const res = await fetch("http://localhost:5000/api/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password, role: "user" }),
+          })
+          const data = await res.json()
+
+          if (data.msg === "Sign up successful") {
+            setError("Sign up successful! Please sign in with your credentials.")
+            setSignIn(true)
+          } else {
+            setError(data.msg || "Sign up failed.")
+          }
+        } catch {
+          setError("Server error. Please try again later.")
+        }
+      } else {
+        setError("Please fill in all fields.")
+      }
+    }
+    setLoading(false)
+  } */
         setError("Sign up successful! Please sign in with your credentials.")
         setSignIn(true) // Switch to sign in form
       } else {
         setError("Please fill in all fields.")
       }
     }
-
     setLoading(false)
   }
-
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked")
   }
@@ -75,7 +110,6 @@ const LoginForm: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-800">Sherine Travels and Tours 🚗</h1>
       </header>
  
-
       <div className={styles.container}>
         <div className={`${styles.signUpContainer} ${!signIn ? styles.active : ""}`}>
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -120,7 +154,7 @@ const LoginForm: React.FC = () => {
             <h1 className={styles.title}>Sign In</h1>
             <input className={styles.input} type="email" name="email" placeholder="Email" required />
             <input className={styles.input} type="password" name="password" placeholder="Password" required />
-            <a className={styles.anchor} href="#">
+            <a className={styles.anchor} href="ForgotPassword">
               Forgot your password?
             </a>
 
