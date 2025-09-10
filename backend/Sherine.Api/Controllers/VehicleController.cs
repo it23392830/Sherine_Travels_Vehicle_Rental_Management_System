@@ -43,7 +43,9 @@ namespace Sherine.Api.Controllers
             var vehicle = new Vehicle
             {
                 Type = dto.Type,
-                Price = dto.Price,
+                PriceWithDriver = dto.PriceWithDriver,
+                PriceWithoutDriver = dto.PriceWithoutDriver,
+                Seats = dto.Seats,
                 Status = dto.Status
             };
             _context.Vehicles.Add(vehicle);
@@ -59,7 +61,9 @@ namespace Sherine.Api.Controllers
             if (vehicle == null) return NotFound();
 
             vehicle.Type = dto.Type;
-            vehicle.Price = dto.Price;
+            vehicle.PriceWithDriver = dto.PriceWithDriver;
+            vehicle.PriceWithoutDriver = dto.PriceWithoutDriver;
+            vehicle.Seats = dto.Seats;
             vehicle.Status = dto.Status;
 
             await _context.SaveChangesAsync();
@@ -79,3 +83,4 @@ namespace Sherine.Api.Controllers
         }
     }
 }
+
