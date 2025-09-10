@@ -25,19 +25,33 @@ const LoginForm: React.FC = () => {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-    const validCredentials = {
+    const validCredentials = [
+      {
       email: "manager@sherine.com",
       password: "manager123",
-    }
+      redirect: "/dashboard/manager",
+    },
+
+    {
+        email: "owner@sherine.com",
+        password: "owner123",
+        redirect: "/dashboard/owner",
+    },
+  ]
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     if (signIn) {
-      if (email === validCredentials.email && password === validCredentials.password) {
-        router.push("/dashboard")
+    const matchedUser = validCredentials.find(
+      (cred) => cred.email === email && cred.password === password
+    )
+
+   if (matchedUser) {
+      router.push(matchedUser.redirect) // redirect to role-based dashboard
       } else {
         setError("Invalid email or password. Please try again.")
       }
+
     } else {
       const name = formData.get("name") as string
       if (name && email && password) {
