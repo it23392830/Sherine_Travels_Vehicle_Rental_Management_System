@@ -1,6 +1,6 @@
- "use client"
+"use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,55 +17,7 @@ interface Vehicle {
 }
 
 export default function AssignVehiclesPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    {
-      id: 1,
-      plate: "ABC-123",
-      model: "Toyota Sienna",
-      status: "Available",
-      seats: 7,
-      priceVehicleOnly: 50000,
-      priceWithDriver: 60000,
-    },
-    {
-      id: 2,
-      plate: "XYZ-456",
-      model: "Kia Carnival",
-      status: "In Service",
-      seats: 7,
-      priceVehicleOnly: 45000,
-      priceWithDriver: 55000,
-    },
-    {
-      id: 3,
-      plate: "Ml-7456",
-      model: "Nissan Caravan",
-      status: "Available",
-      seats: 12,
-      priceVehicleOnly: 65000,
-      priceWithDriver: 75000,
-    },
-    {
-      id: 4,
-      plate: "KLo98",
-      model: "Toyota HiAce",
-      status: "In Service",
-      seats: 12,
-      priceVehicleOnly: 35000,
-      priceWithDriver: 45000,
-    },
-    {
-      id: 5,
-      plate: "Vby-780o",
-      model: "Toyota HiAce High Roo",
-      status: "Out of Service",
-      seats: 12,
-      priceVehicleOnly: 62000,
-      priceWithDriver: 72000,
-    },
-
-  ])
-
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [form, setForm] = useState({
     plate: "",
     model: "",
@@ -74,45 +26,66 @@ export default function AssignVehiclesPage() {
     priceVehicleOnly: "",
     priceWithDriver: "",
   })
-
   const [editingId, setEditingId] = useState<number | null>(null)
 
-  const handleAddOrUpdate = () => {
+  // 🔹 Load vehicles from backend
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const res = await fetch("/api/vehicles") // replace with your backend API
+        if (!res.ok) throw new Error("Failed to fetch vehicles")
+        const data: Vehicle[] = await res.json()
+        setVehicles(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchVehicles()
+  }, [])
+
+  const handleAddOrUpdate = async () => {
     if (!form.plate || !form.model || !form.seats || !form.priceVehicleOnly || !form.priceWithDriver) return
 
-     if (editingId) {
-  // Update
-  setVehicles((prev) =>
-    prev.map((v) =>
-      v.id === editingId
-        ? {
-            ...v,
-            plate: form.plate,
-            model: form.model,
-            status: form.status as Vehicle["status"], // <-- cast here
-            seats: Number(form.seats),
-            priceVehicleOnly: Number(form.priceVehicleOnly),
-            priceWithDriver: Number(form.priceWithDriver),
-          }
-        : v
-    )
-  )
-  setEditingId(null)
-} else {
-  // Add new
-  const newVehicle: Vehicle = {
-    id: Date.now(),
-    plate: form.plate,
-    model: form.model,
-    status: form.status as Vehicle["status"], // <-- cast here too
-    seats: Number(form.seats),
-    priceVehicleOnly: Number(form.priceVehicleOnly),
-    priceWithDriver: Number(form.priceWithDriver),
-  }
-  setVehicles((prev) => [...prev, newVehicle])
-}
+    const vehicleData: Omit<Vehicle, "id"> = {
+      plate: form.plate,
+      model: form.model,
+      status: form.status as Vehicle["status"],
+      seats: Number(form.seats),
+      priceVehicleOnly: Number(form.priceVehicleOnly),
+      priceWithDriver: Number(form.priceWithDriver),
+    }
 
-    setForm({ plate: "", model: "", status: "Available", seats: "", priceVehicleOnly: "", priceWithDriver: "" })
+    try {
+      if (editingId) {
+        // 🔹 Update
+        const res = await fetch(`/api/vehicles/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(vehicleData),
+        })
+        if (!res.ok) throw new Error("Failed to update vehicle")
+
+        const updatedVehicle: Vehicle = await res.json()
+        setVehicles((prev) => prev.map((v) => (v.id === editingId ? updatedVehicle : v)))
+        setEditingId(null)
+      } else {
+        // 🔹 Add new
+        const res = await fetch("/api/vehicles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(vehicleData),
+        })
+        if (!res.ok) throw new Error("Failed to add vehicle")
+
+        const newVehicle: Vehicle = await res.json()
+        setVehicles((prev) => [...prev, newVehicle])
+      }
+
+      // reset form
+      setForm({ plate: "", model: "", status: "Available", seats: "", priceVehicleOnly: "", priceWithDriver: "" })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleEdit = (vehicle: Vehicle) => {
@@ -127,8 +100,15 @@ export default function AssignVehiclesPage() {
     setEditingId(vehicle.id)
   }
 
-  const handleDelete = (id: number) => {
-    setVehicles((prev) => prev.filter((v) => v.id !== id))
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/vehicles/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete vehicle")
+
+      setVehicles((prev) => prev.filter((v) => v.id !== id))
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -173,8 +153,7 @@ export default function AssignVehiclesPage() {
             aria-label="Vehicle Status"
             className="border rounded p-2 w-full"
             value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })
-          }
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
             <option>Available</option>
             <option>In Service</option>
@@ -192,7 +171,9 @@ export default function AssignVehiclesPage() {
         {vehicles.map((vehicle) => (
           <Card key={vehicle.id}>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{vehicle.plate} - {vehicle.model}</CardTitle>
+              <CardTitle>
+                {vehicle.plate} - {vehicle.model}
+              </CardTitle>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => handleEdit(vehicle)}>
                   <Pencil className="h-4 w-4" />
@@ -203,10 +184,20 @@ export default function AssignVehiclesPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p>Status: <span className="font-medium">{vehicle.status}</span></p>
-              <p>Seats: <span className="font-medium">{vehicle.seats}</span></p>
-              <p>Price - Vehicle Only: <span className="font-medium">LKR {vehicle.priceVehicleOnly.toLocaleString()}</span></p>
-              <p>Price - Vehicle + Driver: <span className="font-medium">LKR {vehicle.priceWithDriver.toLocaleString()}</span></p>
+              <p>
+                Status: <span className="font-medium">{vehicle.status}</span>
+              </p>
+              <p>
+                Seats: <span className="font-medium">{vehicle.seats}</span>
+              </p>
+              <p>
+                Price - Vehicle Only:{" "}
+                <span className="font-medium">LKR {vehicle.priceVehicleOnly.toLocaleString()}</span>
+              </p>
+              <p>
+                Price - Vehicle + Driver:{" "}
+                <span className="font-medium">LKR {vehicle.priceWithDriver.toLocaleString()}</span>
+              </p>
             </CardContent>
           </Card>
         ))}
