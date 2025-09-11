@@ -76,6 +76,78 @@ namespace Sherine.Api.Controllers
             return Ok(new { token, roles });
         }
 
+        /// <summary>
+        /// OAuth sign-in/up. Creates the user if not exists (User/Driver only) and returns JWT.
+        /// </summary>
+        [HttpPost("oauth")]
+        public async Task<IActionResult> OAuth([FromBody] Sherine.Api.DTOs.OAuthDto dto)
+        {
+            string email = dto.Email;
+            string fullName = string.IsNullOrWhiteSpace(dto.FullName) ? dto.Email : dto.FullName;
+            string requestedRole = dto.RequestedRole ?? "User";
+
+            if (string.IsNullOrWhiteSpace(email)) return BadRequest(new { message = "Email is required" });
+
+            var allowedRole = requestedRole?.Equals("Driver", StringComparison.OrdinalIgnoreCase) == true ? "Driver" : "User";
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    Email = email,
+                    UserName = email,
+                    FullName = fullName
+                };
+
+                var create = await _userManager.CreateAsync(user);
+                if (!create.Succeeded) return BadRequest(create.Errors);
+
+                if (!await _roleManager.RoleExistsAsync(allowedRole))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(allowedRole));
+                }
+                await _userManager.AddToRoleAsync(user, allowedRole);
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // If a role is requested (User/Driver), align the account to that single role
+            if (!string.IsNullOrWhiteSpace(requestedRole))
+            {
+                var desiredRole = requestedRole.Equals("Driver", StringComparison.OrdinalIgnoreCase) ? "Driver" : "User";
+
+                // Ensure role exists
+                if (!await _roleManager.RoleExistsAsync(desiredRole))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(desiredRole));
+                }
+
+                // Remove the other role if present
+                var otherRole = desiredRole == "Driver" ? "User" : "Driver";
+                if (roles.Contains(otherRole))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, otherRole);
+                    roles = await _userManager.GetRolesAsync(user);
+                }
+
+                // Add desired role if missing
+                if (!roles.Contains(desiredRole))
+                {
+                    await _userManager.AddToRoleAsync(user, desiredRole);
+                    roles = await _userManager.GetRolesAsync(user);
+                }
+            }
+
+            if (!roles.Contains("User") && !roles.Contains("Driver"))
+            {
+                return Unauthorized(new { message = "Account role is not permitted for OAuth." });
+            }
+
+            var token = await _tokenService.CreateTokenAsync(user, roles);
+            return Ok(new { token, roles });
+        }
+
         // ❌ Removed AssignRole endpoint 
         // Managers and Owners must be seeded in DbInitializer, not assigned via API
     }

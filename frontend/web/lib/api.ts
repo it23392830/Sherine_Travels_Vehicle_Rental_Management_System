@@ -10,6 +10,17 @@ export async function apiFetch<T = any>(
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL as string;
+  if (!baseUrl) {
+    const configHelp =
+      'Missing NEXT_PUBLIC_API_URL. Set it in frontend/web/.env.local (e.g., NEXT_PUBLIC_API_URL=http://localhost:5152/api) and restart dev server.'
+    const error = new Error(configHelp)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    error.code = 'CONFIG_MISSING_API_URL'
+    // eslint-disable-next-line no-console
+    console.error('apiFetch config error:', { message: error.message })
+    throw error
+  }
   const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
   const headers: HeadersInit = {
@@ -33,6 +44,9 @@ export async function apiFetch<T = any>(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       error.status = res.status;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      error.url = url;
       throw error;
     }
 
@@ -40,10 +54,15 @@ export async function apiFetch<T = any>(
   } catch (err: any) {
     // Log detailed network error for debugging
     // eslint-disable-next-line no-console
+    console.error("apiFetch raw error:", err)
+    // eslint-disable-next-line no-console
     console.error("apiFetch error:", {
       path,
       message: err?.message,
       stack: err?.stack,
+      status: err?.status,
+      url: err?.url,
+      online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
     });
     throw err;
   }

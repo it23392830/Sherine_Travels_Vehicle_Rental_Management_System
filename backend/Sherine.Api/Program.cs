@@ -81,9 +81,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    // In development, allow HTTP without redirect to simplify local frontend calls
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // ✅ Enable CORS before authentication
 app.UseCors("AllowFrontend");
