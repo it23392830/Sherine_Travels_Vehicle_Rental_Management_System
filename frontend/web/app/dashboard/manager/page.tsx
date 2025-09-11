@@ -228,7 +228,7 @@ export default function ManagerDashboard() {
                   </div>
                   <div className="pt-2">
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-primary h-2 rounded-full" style={{ width: "78%" }}></div>
+                      <div className="bg-primary h-2 rounded-full w-[78%]"></div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">78% fleet availability</p>
                   </div>
