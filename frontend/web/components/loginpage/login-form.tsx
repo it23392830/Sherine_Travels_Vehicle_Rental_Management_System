@@ -1,4 +1,4 @@
-"use client"
+ "use client"
 
 import type React from "react"
 import { useState } from "react"
@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
 
   const handleToggle = (isSignIn: boolean) => {
     setSignIn(isSignIn)
-    setError("") // Clear error when switching forms
+    setError("")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,81 +25,53 @@ const LoginForm: React.FC = () => {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
-     // Hardcoded manager & owner credentials
-    const validCredentials = [
-      { email: "manager@sherine.com", password: "manager123", redirect: "/dashboard/manager" },
-      { email: "owner@sherine.com", password: "owner123", redirect: "/dashboard/owner" },
-    ]
+    try {
+      if (signIn) {
+        // ✅ Sign In with backend
+        const res = await fetch("http://localhost:5000/api/signin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        })
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+        const data = await res.json()
 
-    if (signIn) {
-      // Check Manager/Owner first
-    const matchedUser = validCredentials.find(
-      (cred) => cred.email === email && cred.password === password
-    )
-
-   if (matchedUser) {
-      router.push(matchedUser.redirect) // redirect to role-based dashboard
-      } 
-      else {
-        /*Backend authentication simulation
-        try {
-          const res = await fetch("http://localhost:5000/api/signin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          })
-          const data = await res.json()
-
-          if (data.redirect) {
-            router.push(data.redirect)
-          } else {
-            setError(data.msg || "Invalid email or password.")
-          }
-        } catch {
-          setError("Server error. Please try again later.")
-        } */
-
-        setError("Invalid email or password. Please try again.")
-      }
-
-    } else {
-      
-      const name = formData.get("name") as string
-      if (name && email && password) {
-         /*Sign Up for Users/Drivers
-         try {
-          const res = await fetch("http://localhost:5000/api/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password, role: "user" }),
-          })
-          const data = await res.json()
-
-          if (data.msg === "Sign up successful") {
-            setError("Sign up successful! Please sign in with your credentials.")
-            setSignIn(true)
-          } else {
-            setError(data.msg || "Sign up failed.")
-          }
-        } catch {
-          setError("Server error. Please try again later.")
+        if (res.ok && data.redirect) {
+          router.push(data.redirect) // backend decides the dashboard path
+        } else {
+          setError(data.msg || "Invalid email or password.")
         }
       } else {
-        setError("Please fill in all fields.")
+        // ✅ Sign Up with backend
+        const name = formData.get("name") as string
+        if (!name || !email || !password) {
+          setError("Please fill in all fields.")
+          setLoading(false)
+          return
+        }
+
+        const res = await fetch("http://localhost:5000/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        })
+
+        const data = await res.json()
+
+        if (res.ok) {
+          setError("Sign up successful! Please sign in with your credentials.")
+          setSignIn(true) // switch to login form
+        } else {
+          setError(data.msg || "Sign up failed.")
+        }
       }
+    } catch (err) {
+      setError("Server error. Please try again later.")
     }
-    setLoading(false)
-  } */
-        setError("Sign up successful! Please sign in with your credentials.")
-        setSignIn(true) // Switch to sign in form
-      } else {
-        setError("Please fill in all fields.")
-      }
-    }
+
     setLoading(false)
   }
+
   const handleGoogleSignIn = () => {
     console.log("Google sign-in clicked")
   }
@@ -109,8 +81,9 @@ const LoginForm: React.FC = () => {
       <header className="text-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Sherine Travels and Tours 🚗</h1>
       </header>
- 
+
       <div className={styles.container}>
+        {/* Sign Up */}
         <div className={`${styles.signUpContainer} ${!signIn ? styles.active : ""}`}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <h1 className={styles.title}>Create Account</h1>
@@ -149,6 +122,7 @@ const LoginForm: React.FC = () => {
           </form>
         </div>
 
+        {/* Sign In */}
         <div className={`${styles.signInContainer} ${!signIn ? styles.inactive : ""}`}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <h1 className={styles.title}>Sign In</h1>
@@ -166,6 +140,7 @@ const LoginForm: React.FC = () => {
           </form>
         </div>
 
+        {/* Overlay */}
         <div className={`${styles.overlayContainer} ${!signIn ? styles.inactive : ""}`}>
           <div className={`${styles.overlay} ${!signIn ? styles.inactive : ""}`}>
             <div className={`${styles.overlayPanel} ${styles.leftOverlayPanel} ${!signIn ? styles.active : ""}`}>
