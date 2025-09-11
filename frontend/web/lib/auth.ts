@@ -38,16 +38,17 @@ export const AuthService = {
     });
 
     if (!res.ok) {
-      let message = "Login failed";
+      let message: unknown = "Login failed";
       try {
         const body = await res.json();
-        message = body?.message || body?.error || body || message;
+        message = (body && (body.message || body.error)) || body || message;
       } catch {
         try {
           message = await res.text();
         } catch {}
       }
-      throw new Error(message || "Invalid credentials");
+      const msgStr = typeof message === "string" ? message : JSON.stringify(message);
+      throw new Error(msgStr || "Invalid credentials");
     }
 
     const data = await res.json();
@@ -77,16 +78,17 @@ export const AuthService = {
     });
 
     if (!res.ok) {
-      let message = "Signup failed";
+      let message: unknown = "Signup failed";
       try {
         const body = await res.json();
-        message = body?.message || body?.error || body || message;
+        message = (body && (body.message || body.error)) || body || message;
       } catch {
         try {
           message = await res.text();
         } catch {}
       }
-      throw new Error(message || "Signup failed");
+      const msgStr = typeof message === "string" ? message : JSON.stringify(message);
+      throw new Error(msgStr || "Signup failed");
     }
 
     return await res.json();

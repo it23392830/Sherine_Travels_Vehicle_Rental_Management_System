@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { AuthService } from "@/lib/auth"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "@/hooks/use-toast"
+import { signIn as nextAuthSignIn } from "next-auth/react"
 import styles from "./login-form.module.css"
 
 const LoginForm: React.FC = () => {
@@ -13,6 +14,8 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const [signUpRole, setSignUpRole] = useState<"User" | "Driver">("User")
+
   const router = useRouter()
 
   const handleToggle = (isSignIn: boolean) => {
@@ -52,26 +55,32 @@ const LoginForm: React.FC = () => {
           return
         }
         try {
-          await AuthService.signup(name, email, password, "User")
-          const msg = "Sign up successful! Please sign in with your credentials."
-          setError(msg)
-          toast({ title: "Signup successful", description: msg })
-          setSignIn(true)
+          await AuthService.signup(name, email, password, signUpRole)
+          // Auto-login after successful signup
+          const result = await login(email, password)
+          if (!result.success) {
+            const msg = result.error || "Login after signup failed."
+            setError(msg)
+            toast({ title: "Signup succeeded, login failed", description: msg })
+          }
         } catch (e: any) {
           const msg = e?.message || "Sign up failed."
           setError(msg)
           toast({ title: "Signup failed", description: msg })
         }
       }
-    } catch (err) {
-      setError("Server error. Please try again later.")
+    } catch {
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
-  const handleGoogleSignIn = () => {
-    console.log("Google sign-in clicked")
+  const handleGoogleSignIn = async () => {
+    try {
+      await nextAuthSignIn("google", { callbackUrl: `/oauth-bridge?role=${signUpRole}` })
+    } catch (e: any) {
+      toast({ title: "Google sign-in failed", description: e?.message || "Unknown error" })
+    }
   }
 
   return (
@@ -88,6 +97,30 @@ const LoginForm: React.FC = () => {
             <input className={styles.input} type="text" name="name" placeholder="Name" required />
             <input className={styles.input} type="email" name="email" placeholder="Email" required />
             <input className={styles.input} type="password" name="password" placeholder="Password" required />
+            <p className="text-xs text-gray-500 mb-1">Sign up is only for User or Driver roles.</p>
+
+            <div className="flex items-center gap-4 my-2">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signup_role"
+                  value="User"
+                  checked={signUpRole === "User"}
+                  onChange={() => setSignUpRole("User")}
+                />
+                User
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="signup_role"
+                  value="Driver"
+                  checked={signUpRole === "Driver"}
+                  onChange={() => setSignUpRole("Driver")}
+                />
+                Driver
+              </label>
+            </div>
 
             {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
 
