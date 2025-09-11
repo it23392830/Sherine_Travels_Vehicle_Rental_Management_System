@@ -29,35 +29,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     setIsLoading(true)
+    try {
+      const user = await AuthService.login(email, password)
+      setUser(user)
 
-    const clientInfo = {
-      userAgent: navigator.userAgent,
-      // IP will be determined server-side
-    }
-
-    console.log("[v0] AuthProvider login called with:", { email, password })
-
-    const result = await AuthService.login(email, password, clientInfo)
-
-    console.log("[v0] AuthService.login result:", result)
-
-    if (result.success && result.user) {
-      setUser(result.user)
-
-      console.log("[v0] Setting user:", result.user)
-
-      // Set secure cookies for middleware access
       const secureFlag = window.location.protocol === "https:" ? "; Secure" : ""
       document.cookie = `sherine_auth_token=${AuthService.getToken()}; path=/; max-age=86400; SameSite=Strict${secureFlag}`
-      document.cookie = `sherine_auth_user=${JSON.stringify(result.user)}; path=/; max-age=86400; SameSite=Strict${secureFlag}`
+      document.cookie = `sherine_auth_user=${JSON.stringify(user)}; path=/; max-age=86400; SameSite=Strict${secureFlag}`
 
-      const dashboardRoute = ROLE_ROUTES[result.user.role]
-      console.log("[v0] Redirecting to:", dashboardRoute)
+      const dashboardRoute = ROLE_ROUTES[user.role]
       router.push(dashboardRoute)
+      return { success: true }
+    } catch (err: any) {
+      return { success: false, error: err?.message || "Login failed" }
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
-    return { success: result.success, error: result.error }
   }
 
   const logout = () => {

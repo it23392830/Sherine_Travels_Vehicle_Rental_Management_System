@@ -3,12 +3,16 @@
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { AuthService } from "@/lib/auth"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "@/hooks/use-toast"
 import styles from "./login-form.module.css"
 
 const LoginForm: React.FC = () => {
   const [signIn, setSignIn] = useState(true)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
   const router = useRouter()
 
   const handleToggle = (isSignIn: boolean) => {
@@ -27,42 +31,36 @@ const LoginForm: React.FC = () => {
 
     try {
       if (signIn) {
-        // ✅ Sign In with backend
-        const res = await fetch("http://localhost:5000/api/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        })
-
-        const data = await res.json()
-
-        if (res.ok && data.redirect) {
-          router.push(data.redirect) // backend decides the dashboard path
-        } else {
-          setError(data.msg || "Invalid email or password.")
+        try {
+          // Use provider so it sets user and redirects based on role
+          const result = await login(email, password)
+          if (!result.success) {
+            const msg = result.error || "Invalid email or password."
+            setError(msg)
+            toast({ title: "Login failed", description: msg })
+          }
+        } catch (e: any) {
+          const msg = e?.message || "Invalid email or password."
+          setError(msg)
+          toast({ title: "Login failed", description: msg })
         }
       } else {
-        // ✅ Sign Up with backend
         const name = formData.get("name") as string
         if (!name || !email || !password) {
           setError("Please fill in all fields.")
           setLoading(false)
           return
         }
-
-        const res = await fetch("http://localhost:5000/api/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        })
-
-        const data = await res.json()
-
-        if (res.ok) {
-          setError("Sign up successful! Please sign in with your credentials.")
-          setSignIn(true) // switch to login form
-        } else {
-          setError(data.msg || "Sign up failed.")
+        try {
+          await AuthService.signup(name, email, password, "User")
+          const msg = "Sign up successful! Please sign in with your credentials."
+          setError(msg)
+          toast({ title: "Signup successful", description: msg })
+          setSignIn(true)
+        } catch (e: any) {
+          const msg = e?.message || "Sign up failed."
+          setError(msg)
+          toast({ title: "Signup failed", description: msg })
         }
       }
     } catch (err) {
