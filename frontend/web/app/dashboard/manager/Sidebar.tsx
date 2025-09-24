@@ -2,6 +2,8 @@
 
 import { Home, Car, Users, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
+import { AuthService } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 interface SidebarProps {
   userRole: string
@@ -9,6 +11,13 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ userRole, userName }: SidebarProps) {
+  const router = useRouter()
+
+  const handleLogout = () => {
+    AuthService.logout()
+    router.push("/")
+  }
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r">
       <div className="flex flex-col h-full">
@@ -21,7 +30,7 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
         {/* Navigation Links */}
         <nav className="flex-1 px-4 py-6 space-y-2">
           <Link
-            href="/dashboard/manager" 
+            href="/dashboard/manager"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Home className="h-4 w-4 mr-2" />
@@ -39,10 +48,10 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Users className="h-4 w-4 mr-2" />
-           Assign Drivers
+            Assign Drivers
           </Link>
           <Link
-            href="/dashboard/settings"
+            href="/dashboard/manager/settings"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Settings className="h-4 w-4 mr-2" />
@@ -53,7 +62,7 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
         {/* Footer User Info */}
         <div className="p-4 border-t">
           <p className="text-sm font-medium">{userName}</p>
-          <button className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2">
+          <button onClick={handleLogout} className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </button>

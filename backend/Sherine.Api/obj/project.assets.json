@@ -1,4 +1,4 @@
-{
+ {
   "version": 3,
   "targets": {
     "net9.0": {
@@ -3778,31 +3778,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\NCCS\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Sashanka\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
+      "projectUniqueName": "C:\\Users\\Sashanka\\Downloads\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
       "projectName": "Sherine.Api",
-      "projectPath": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
-      "packagesPath": "C:\\Users\\NCCS\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\obj\\",
+      "projectPath": "C:\\Users\\Sashanka\\Downloads\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
+      "packagesPath": "C:\\Users\\Sashanka\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Sashanka\\Downloads\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\NCCS\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Sashanka\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
