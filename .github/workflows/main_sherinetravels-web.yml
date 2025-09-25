@@ -23,23 +23,16 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: npm install (verify only)
         run: |
           npm install
-          npm run build --if-present
-          mkdir -p build_output
-          cp -r .next/standalone/* build_output/
-          mkdir -p build_output/.next
-          cp -r .next/static build_output/.next/
-          if [ -d "public" ]; then cp -r public build_output/public; fi
-          cp package.json build_output/
         working-directory: ./frontend/web
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./frontend/web/build_output
+          path: ./frontend/web
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-          path: ./frontend/web/build_output
+          path: ./frontend/web
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -71,7 +64,7 @@ jobs:
         with:
           app-name: 'sherinetravels-web'
           slot-name: 'Production'
-          package: ./frontend/web/build_output
-          startup-command: 'node server.js'
+          package: ./frontend/web
+          enable-oryx-build: true
 
           
