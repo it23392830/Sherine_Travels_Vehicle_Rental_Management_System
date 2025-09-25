@@ -37,11 +37,11 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
             User Dashboard
           </Link>
           <Link
-            href="/dashboard/user/booking"
+            href="/dashboard/user/mybookings"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Car className="h-4 w-4 mr-2" />
-            My Booking 
+            My Bookings
           </Link>
           <Link
             href="/dashboard/user/history"

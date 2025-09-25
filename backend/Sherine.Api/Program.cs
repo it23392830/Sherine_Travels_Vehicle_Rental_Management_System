@@ -94,7 +94,8 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     if (environment.IsDevelopment() && useSqliteDev)
     {
-        // For SQLite in dev, ensure schema exists without provider-specific migrations
+        // For SQLite in dev, force recreate schema to reflect latest model
+        db.Database.EnsureDeleted();
         db.Database.EnsureCreated();
     }
     else

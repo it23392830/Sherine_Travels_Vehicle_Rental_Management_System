@@ -30,9 +30,20 @@ namespace Sherine.Api.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            // Find an available vehicle
-            var availableVehicle = await _db.Vehicles
-                .FirstOrDefaultAsync(v => v.Status == "Available");
+            // Use requested vehicle if provided, otherwise pick any available
+            Vehicle? availableVehicle = null;
+            if (dto.VehicleId > 0)
+            {
+                availableVehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == dto.VehicleId);
+                if (availableVehicle == null)
+                    return BadRequest(new { message = "Selected vehicle not found" });
+                if (availableVehicle.Status == "Out of Service")
+                    return BadRequest(new { message = "Selected vehicle unavailable" });
+            }
+            if (availableVehicle == null)
+            {
+                availableVehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Status == "Available");
+            }
 
             if (availableVehicle == null)
                 return BadRequest(new { message = "No vehicles available" });
