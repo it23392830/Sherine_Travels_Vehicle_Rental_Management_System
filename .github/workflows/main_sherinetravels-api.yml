@@ -12,6 +12,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -41,14 +44,16 @@ jobs:
           </configuration>
           EOF
 
-      - name: Restore
-        run: dotnet restore backend/Sherine.sln --configfile ./NuGet.config
+      - name: Clean obj/bin and restore
+        run: |
+          find backend -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} +
+          dotnet restore backend/Sherine.sln --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
 
       - name: Build with dotnet
-        run: dotnet build backend/Sherine.sln -c Release --no-restore
+        run: dotnet build backend/Sherine.sln -c Release --no-restore -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
 
       - name: dotnet publish
-        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --no-restore --configfile ./NuGet.config
+        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --no-restore --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
 
       - name: Verify publish output
         run: |
