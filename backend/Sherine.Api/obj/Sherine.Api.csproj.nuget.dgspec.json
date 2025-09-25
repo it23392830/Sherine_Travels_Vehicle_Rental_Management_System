@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj": {}
+    "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj": {
+    "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
+        "projectUniqueName": "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
         "projectName": "Sherine.Api",
-        "projectPath": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
-        "packagesPath": "C:\\Users\\NCCS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\NCCS\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\obj\\",
+        "projectPath": "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\NCCS\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -68,6 +62,10 @@
               "target": "Package",
               "version": "[9.0.8, )"
             },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
             "MySqlConnector": {
               "target": "Package",
               "version": "[2.4.0, )"
@@ -100,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

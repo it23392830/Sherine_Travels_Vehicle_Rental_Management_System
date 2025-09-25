@@ -9,37 +9,63 @@ import { Pencil, Trash2, PlusCircle } from "lucide-react"
 interface Vehicle {
   id: number
   type: string
+  number: string
   status: "Available" | "In Service" | "Out of Service"
   seats: number
   priceWithoutDriver: number
   priceWithDriver: number
+  imageUrl1?: string | null
+  imageUrl2?: string | null
 }
 
-// ✅ Use API base from .env.local
+// ✅ Preferred API base from env (falls back at runtime in fetch logic)
 const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 export default function AssignVehiclesPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [form, setForm] = useState({
     type: "",
+    number: "",
     status: "Available",
     seats: "",
     priceWithoutDriver: "",
     priceWithDriver: "",
+    imageUrl1: "",
+    imageUrl2: "",
+    imageFile1: null as File | null,
+    imageFile2: null as File | null,
   })
   const [editingId, setEditingId] = useState<number | null>(null)
 
-  // 🔹 Load vehicles from backend
+  // 🔹 Load vehicles from backend (resilient across backend profiles)
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const token = localStorage.getItem("sherine_auth_token")
-        const res = await fetch(`${API_BASE}/vehicle`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) throw new Error("Failed to fetch vehicles")
-        const data: Vehicle[] = await res.json()
-        setVehicles(data)
+        const bases = [
+          API_BASE,
+          "http://localhost:5152/api",
+          "https://localhost:7126/api",
+        ].filter(Boolean) as string[]
+
+        let lastErr: any = null
+        for (const base of bases) {
+          try {
+            const res = await fetch(`${base}/vehicle`)
+            if (!res.ok) {
+              const msg = await res.text().catch(() => "")
+              console.error("GET /vehicle failed:", base, res.status, msg)
+              lastErr = new Error(`GET failed ${res.status}`)
+              continue
+            }
+            const data: Vehicle[] = await res.json()
+            setVehicles(data)
+            return
+          } catch (e) {
+            console.error("GET /vehicle network error:", base, e)
+            lastErr = e
+          }
+        }
+        if (lastErr) throw lastErr
       } catch (error) {
         console.error(error)
       }
@@ -48,15 +74,19 @@ export default function AssignVehiclesPage() {
   }, [])
 
   const handleAddOrUpdate = async () => {
-    if (!form.type || !form.seats || !form.priceWithoutDriver || !form.priceWithDriver) return
+    if (!form.type || !form.number || !form.seats || !form.priceWithoutDriver || !form.priceWithDriver) return
 
-    const vehicleData: Omit<Vehicle, "id"> = {
-      type: form.type,
-      status: form.status as Vehicle["status"],
-      seats: Number(form.seats),
-      priceWithoutDriver: Number(form.priceWithoutDriver),
-      priceWithDriver: Number(form.priceWithDriver),
-    }
+    const formData = new FormData()
+    formData.append("Type", form.type)
+    formData.append("Number", form.number)
+    formData.append("Status", form.status)
+    formData.append("Seats", String(Number(form.seats)))
+    formData.append("PriceWithoutDriver", String(Number(form.priceWithoutDriver)))
+    formData.append("PriceWithDriver", String(Number(form.priceWithDriver)))
+    if (form.imageUrl1) formData.append("ImageUrl1", form.imageUrl1)
+    if (form.imageUrl2) formData.append("ImageUrl2", form.imageUrl2)
+    if (form.imageFile1) formData.append("ImageFile1", form.imageFile1)
+    if (form.imageFile2) formData.append("ImageFile2", form.imageFile2)
 
     try {
       const token = localStorage.getItem("sherine_auth_token")
@@ -66,12 +96,15 @@ export default function AssignVehiclesPage() {
         const res = await fetch(`${API_BASE}/vehicle/${editingId}`, {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(vehicleData),
+          body: formData,
         })
-        if (!res.ok) throw new Error("Failed to update vehicle")
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "")
+          console.error("Update vehicle failed:", res.status, msg)
+          throw new Error("Failed to update vehicle")
+        }
 
         const updatedVehicle: Vehicle = await res.json()
         setVehicles((prev) => prev.map((v) => (v.id === editingId ? updatedVehicle : v)))
@@ -81,19 +114,22 @@ export default function AssignVehiclesPage() {
         const res = await fetch(`${API_BASE}/vehicle`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(vehicleData),
+          body: formData,
         })
-        if (!res.ok) throw new Error("Failed to add vehicle")
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "")
+          console.error("Add vehicle failed:", res.status, msg)
+          throw new Error("Failed to add vehicle")
+        }
 
         const newVehicle: Vehicle = await res.json()
         setVehicles((prev) => [...prev, newVehicle])
       }
 
       // reset form
-      setForm({ type: "", status: "Available", seats: "", priceWithoutDriver: "", priceWithDriver: "" })
+      setForm({ type: "", number: "", status: "Available", seats: "", priceWithoutDriver: "", priceWithDriver: "", imageUrl1: "", imageUrl2: "", imageFile1: null, imageFile2: null })
     } catch (error) {
       console.error(error)
     }
@@ -102,10 +138,13 @@ export default function AssignVehiclesPage() {
   const handleEdit = (vehicle: Vehicle) => {
     setForm({
       type: vehicle.type,
+      number: vehicle.number,
       status: vehicle.status,
       seats: vehicle.seats.toString(),
       priceWithoutDriver: vehicle.priceWithoutDriver.toString(),
       priceWithDriver: vehicle.priceWithDriver.toString(),
+      imageUrl1: vehicle.imageUrl1 ?? "",
+      imageUrl2: vehicle.imageUrl2 ?? "",
     })
     setEditingId(vehicle.id)
   }
@@ -141,6 +180,11 @@ export default function AssignVehiclesPage() {
             onChange={(e) => setForm({ ...form, type: e.target.value })}
           />
           <Input
+            placeholder="Vehicle Number (e.g. ABC-1234)"
+            value={form.number}
+            onChange={(e) => setForm({ ...form, number: e.target.value })}
+          />
+          <Input
             type="number"
             placeholder="Seats"
             value={form.seats}
@@ -158,6 +202,19 @@ export default function AssignVehiclesPage() {
             value={form.priceWithDriver}
             onChange={(e) => setForm({ ...form, priceWithDriver: e.target.value })}
           />
+          {/* Removed Image URL inputs as requested */}
+          <div className="flex gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setForm({ ...form, imageFile1: e.target.files?.[0] || null })}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setForm({ ...form, imageFile2: e.target.files?.[0] || null })}
+            />
+          </div>
           <select
             aria-label="Vehicle Status"
             className="border rounded p-2 w-full"

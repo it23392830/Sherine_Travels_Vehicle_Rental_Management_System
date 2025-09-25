@@ -93,7 +93,5 @@ Update launchSettings.json in API to fix port conflicts.
 
 For MySQL errors, ensure DB is running and MYSQL_CONN is set.
 
-🚀 You are ready to start coding!
-
 
 ---

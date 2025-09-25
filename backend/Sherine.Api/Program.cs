@@ -11,10 +11,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- Configuration ---
 var configuration = builder.Configuration;
+var environment = builder.Environment;
 
-// Add DB (Postgres)
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+// Add DB (Postgres by default; optional SQLite dev fallback)
+var useSqliteDev = configuration.GetValue<bool>("UseSqliteDev");
+if (environment.IsDevelopment() && useSqliteDev)
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(configuration.GetConnectionString("SqliteConnection") ?? "Data Source=dev.db"));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -60,18 +70,37 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+        policy =>
+        {
+            if (environment.IsDevelopment())
+            {
+                // In development, allow any origin to simplify local testing across ports
+                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            }
+            else
+            {
+                policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            }
+        });
 });
 
 var app = builder.Build();
 
-// ✅ Ensure DB migrations and seed roles/admins on startup
+// ✅ Ensure DB schema and seed roles/admins on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate(); // Apply any pending migrations
+    if (environment.IsDevelopment() && useSqliteDev)
+    {
+        // For SQLite in dev, ensure schema exists without provider-specific migrations
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        db.Database.Migrate(); // Apply any pending migrations
+    }
 
     var initializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
     await initializer.SeedRolesAndAdminAsync(); // Seed roles + Owner + Manager
@@ -94,6 +123,9 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Serve static files for uploaded images (wwwroot)
+app.UseStaticFiles();
 
 app.MapControllers();
 

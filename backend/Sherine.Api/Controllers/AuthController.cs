@@ -45,7 +45,7 @@ namespace Sherine.Api.Controllers
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            // ✅ Only allow User or Driver at registration
+            //  Only allow User or Driver at registration
             var role = userType.Equals("Driver", StringComparison.OrdinalIgnoreCase) ? "Driver" : "User";
 
             if (!await _roleManager.RoleExistsAsync(role))

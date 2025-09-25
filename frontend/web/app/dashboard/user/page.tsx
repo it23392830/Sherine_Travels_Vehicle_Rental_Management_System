@@ -67,7 +67,7 @@ export default function UserDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Link href="/dashboard/user/bookingride">
+                <Link href="/dashboard/user/vehicles">
                   <Button className="h-20 flex flex-col items-center justify-center">Book Ride</Button>
                 </Link>
                 <Link href="/dashboard/user/cancelride">

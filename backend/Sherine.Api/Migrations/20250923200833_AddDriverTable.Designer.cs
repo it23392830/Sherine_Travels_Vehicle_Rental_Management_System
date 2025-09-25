@@ -12,8 +12,8 @@ using Sherine.Api.Data;
 namespace Sherine.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250911100150_RenameVehicleColumns")]
-    partial class RenameVehicleColumns
+    [Migration("20250923200833_AddDriverTable")]
+    partial class AddDriverTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,6 +225,42 @@ namespace Sherine.Api.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Sherine.Api.Models.Driver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LicenseNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("\"VehicleId\" IS NOT NULL");
+
+                    b.ToTable("Drivers");
+                });
+
             modelBuilder.Entity("Sherine.Api.Models.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -304,6 +340,15 @@ namespace Sherine.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Sherine.Api.Models.Driver", b =>
+                {
+                    b.HasOne("Sherine.Api.Models.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId");
+
+                    b.Navigation("Vehicle");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { apiFetch } from "@/lib/api"
 
 export default function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false)
@@ -14,10 +15,79 @@ export default function SettingsPage() {
     push: true,
   })
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const [profile, setProfile] = useState({ fullName: "", email: "", phoneNumber: "" })
+  const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmNewPassword: "" })
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const me = await apiFetch<{ email: string; fullName: string; phoneNumber?: string }>("/user/me")
+        setProfile({ fullName: me.fullName, email: me.email, phoneNumber: me.phoneNumber ?? "" })
+      } catch (e: any) {
+        // eslint-disable-next-line no-alert
+        alert(`Failed to load profile: ${e?.message || "Unknown error"}`)
+      }
+    }
+    load()
+  }, [])
+
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: call backend API
-    alert("Password updated successfully!")
+    setLoading(true)
+    try {
+      await apiFetch("/user/profile", {
+        method: "PUT",
+        body: JSON.stringify({
+          fullName: profile.fullName,
+          email: profile.email,
+          phoneNumber: profile.phoneNumber || undefined,
+        }),
+      })
+      // Persist updated name to localStorage so dashboards/sidebars reflect immediately
+      if (typeof window !== "undefined") {
+        const raw = window.localStorage.getItem("sherine_auth_user")
+        if (raw) {
+          try {
+            const user = JSON.parse(raw)
+            user.fullName = profile.fullName
+            user.email = profile.email
+            window.localStorage.setItem("sherine_auth_user", JSON.stringify(user))
+          } catch { }
+        }
+      }
+      // eslint-disable-next-line no-alert
+      alert("Profile updated successfully!")
+    } catch (e: any) {
+      // eslint-disable-next-line no-alert
+      alert(e?.message || "Failed to update profile")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (passwords.newPassword !== passwords.confirmNewPassword) {
+      // eslint-disable-next-line no-alert
+      alert("New passwords do not match")
+      return
+    }
+    setLoading(true)
+    try {
+      await apiFetch("/user/change-password", {
+        method: "POST",
+        body: JSON.stringify({ currentPassword: passwords.currentPassword, newPassword: passwords.newPassword }),
+      })
+      setPasswords({ currentPassword: "", newPassword: "", confirmNewPassword: "" })
+      // eslint-disable-next-line no-alert
+      alert("Password updated successfully!")
+    } catch (e: any) {
+      // eslint-disable-next-line no-alert
+      alert(e?.message || "Failed to update password")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -32,16 +102,32 @@ export default function SettingsPage() {
             <CardDescription>Update your personal information</CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleProfileSave}>
               <div>
                 <label className="block text-sm mb-1">Full Name</label>
-                <Input type="text" defaultValue="Manager Smith" />
+                <Input
+                  type="text"
+                  value={profile.fullName}
+                  onChange={(e) => setProfile((p) => ({ ...p, fullName: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="block text-sm mb-1">Email</label>
-                <Input type="email" defaultValue="manager@sherine.com" />
+                <Input
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
+                />
               </div>
-              <Button type="submit">Save Changes</Button>
+              <div>
+                <label className="block text-sm mb-1">Phone</label>
+                <Input
+                  type="tel"
+                  value={profile.phoneNumber}
+                  onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))}
+                />
+              </div>
+              <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
             </form>
           </CardContent>
         </Card>
@@ -91,17 +177,32 @@ export default function SettingsPage() {
             <form className="space-y-4" onSubmit={handlePasswordChange}>
               <div>
                 <label className="block text-sm mb-1">Current Password</label>
-                <Input type="password" required />
+                <Input
+                  type="password"
+                  required
+                  value={passwords.currentPassword}
+                  onChange={(e) => setPasswords((p) => ({ ...p, currentPassword: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="block text-sm mb-1">New Password</label>
-                <Input type="password" required />
+                <Input
+                  type="password"
+                  required
+                  value={passwords.newPassword}
+                  onChange={(e) => setPasswords((p) => ({ ...p, newPassword: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="block text-sm mb-1">Confirm New Password</label>
-                <Input type="password" required />
+                <Input
+                  type="password"
+                  required
+                  value={passwords.confirmNewPassword}
+                  onChange={(e) => setPasswords((p) => ({ ...p, confirmNewPassword: e.target.value }))}
+                />
               </div>
-              <Button type="submit">Update Password</Button>
+              <Button type="submit" disabled={loading}>{loading ? "Updating..." : "Update Password"}</Button>
             </form>
           </CardContent>
         </Card>
