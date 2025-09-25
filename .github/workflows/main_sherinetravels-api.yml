@@ -22,18 +22,34 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
+          cache: true
 
       - name: Dotnet info
         run: dotnet --info
 
+      - name: Create CI NuGet.config
+        run: |
+          cat > ./NuGet.config << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+            </packageSources>
+            <fallbackPackageFolders>
+              <clear />
+            </fallbackPackageFolders>
+          </configuration>
+          EOF
+
       - name: Restore
-        run: dotnet restore backend/Sherine.sln
+        run: dotnet restore backend/Sherine.sln --configfile ./NuGet.config
 
       - name: Build with dotnet
         run: dotnet build backend/Sherine.sln -c Release --no-restore
 
       - name: dotnet publish
-        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --no-restore
+        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --no-restore --configfile ./NuGet.config
 
       - name: Verify publish output
         run: |
