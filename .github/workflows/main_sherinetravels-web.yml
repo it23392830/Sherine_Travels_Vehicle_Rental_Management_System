@@ -28,11 +28,16 @@ jobs:
           npm install
         working-directory: ./frontend/web
 
+      - name: Create deployment zip (exclude node_modules/.next)
+        run: |
+          cd frontend/web
+          zip -r ../../webapp.zip . -x "node_modules/*" ".next/*" ".git/*"
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./frontend/web
+          path: webapp.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +51,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-          path: ./frontend/web
+          path: .
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -55,8 +60,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C847DE4F6136468F91E4DDFE2A493C27 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A249DF3EC2E24CC7A4728AB74D7F3899 }}
 
+      - name: Warm up SCM
+        run: |
+          curl -sS "https://sherinetravels-web-b5fad5ccazdgffak.scm.eastasia-01.azurewebsites.net/api/deployments" || true
+          sleep 10
+
       - name: Wait for SCM to stabilize
-        run: sleep 20
+        run: sleep 45
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -64,7 +74,7 @@ jobs:
         with:
           app-name: 'sherinetravels-web'
           slot-name: 'Production'
-          package: ./frontend/web
+          package: webapp.zip
           enable-oryx-build: true
 
           
