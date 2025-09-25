@@ -1,102 +1,113 @@
+## CI/CD, Workflows, and DevOps
 
+This repository uses GitHub Actions to build and deploy both the ASP.NET Core backend API and the Next.js frontend to Azure App Service. This document explains the pipelines, workflows, technologies, and branching strategy.
 
-## ⚙️ Setup Instructions
+### Workflows
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/<your-org>/<your-repo>.git
-cd sherine-travels
+- Backend API workflow: `.github/workflows/main_sherinetravels-api.yml`
+  - Triggers: `push` to `main`, and `workflow_dispatch` (manual run)
+  - Jobs:
+    - Build
+      - Setup .NET SDK 9.x; print `dotnet --info`
+      - Generate CI-only `NuGet.config` (clears fallback folders)
+      - Clean `bin/obj` and restore `backend/Sherine.sln` and `backend/Sherine.Api/Sherine.Api.csproj`
+      - Build solution `-c Release`
+      - Publish `backend/Sherine.Api/Sherine.Api.csproj` to `./publish`
+      - Verify `./publish` exists and upload artifact `dotnet-app`
+    - Deploy (needs: build)
+      - Permissions: `actions: read`, `contents: read`, `id-token: write`
+      - Download artifact `dotnet-app` to `./publish`
+      - Login to Azure using OIDC (`azure/login@v2`)
+      - Deploy folder `./publish` to Azure Web App `sherinetravels-api` (slot `Production`)
 
-2. Backend (API)
-cd backend
-dotnet build Sherine.sln
+- Frontend Web workflow: `.github/workflows/main_sherinetravels-web.yml`
+  - Triggers: `push` to `main`, and `workflow_dispatch` (manual run)
+  - Jobs:
+    - Build
+      - Setup Node.js 20.x
+      - Working directory: `./frontend/web`
+      - `npm install` → `npm run build`
+      - Upload artifact `node-app`
+    - Deploy (needs: build)
+      - Permissions: `actions: read`, `contents: read`, `id-token: write`
+      - Download artifact `node-app`
+      - Login to Azure using OIDC (`azure/login@v2`)
+      - Deploy to Azure Web App `sherinetravels-web` (slot `Production`)
 
-# Run API on port 5000
-dotnet run --project Sherine.Api/Sherine.Api.csproj --urls "http://localhost:5000"
+### Required GitHub Secrets
 
+Add these at: Repository → Settings → Secrets and variables → Actions
 
-Swagger: http://localhost:5000/swagger
+- `AZUREAPPSERVICE_CLIENTID_B350082FE02C446B9EDF8BD4B3E23FBE`
+- `AZUREAPPSERVICE_TENANTID_5CF516035A16486C8CF9D128DBA68974`
+- `AZUREAPPSERVICE_SUBSCRIPTIONID_50133FC329BE44FE900BB49FC78CFABB`
 
-Health check: http://localhost:5000/api/health
+These are used by `azure/login@v2` for federated (OIDC) authentication to Azure; no service principal password is stored.
 
-Dependencies
+### Technologies & Techniques
 
-.NET 8 SDK
+- GitHub Actions runners (`ubuntu-latest`)
+- .NET SDK 9.x, Node.js 20.x
+- NuGet configuration hardened for Linux runners
+  - CI `NuGet.config` clears `fallbackPackageFolders`
+  - `NUGET_PACKAGES` set to a local cache under the workspace
+- Artifacts
+  - Backend: publish to `./publish`, upload as `dotnet-app`
+  - Frontend: upload as `node-app`
+- Azure deployment
+  - `azure/login@v2` (OIDC) and `azure/webapps-deploy@v3`
+  - Targets: `sherinetravels-api` and `sherinetravels-web` (Production slots)
+- Caching and validations
+  - Verify publish output before upload
+  - Explicit restore/build ordering to ensure `project.assets.json` exists
 
-3. Frontend (React app)
-cd frontend/web
-npm install
-npm run dev
+### Branching Strategy with GitHub Actions
 
+- Branches
+  - `main`: protected; only fast-forward merges via approved PRs; deploys to Production via workflows
+  - `dev`: integration branch; optional pre-prod builds or preview environments (if added later)
+  - `feat/<feature-name>`: feature branches; open PRs into `dev` or `main`
+- Pull Requests
+  - Require passing CI checks (build succeeds) before merge
+  - Recommended: at least one reviewer approval
+- Triggers
+  - CI/CD deploys run automatically on `push` to `main`
+  - On-demand runs via "Run workflow" (workflow_dispatch)
 
-Open: http://localhost:5173
+### Operating the Pipelines
 
-Dependencies
+Manual run:
+1. GitHub → Actions → select workflow → Run workflow
+2. Ensure required secrets are configured
+3. Confirm build job uploads artifact (`dotnet-app` or `node-app`) before deploy job starts
 
-Node.js 20+
+Rollback (basic):
+- Re-run a previous successful workflow run (Re-run all jobs) or deploy a previous artifact if retained
 
-4. Database (MySQL)
-Option A: Local MySQL
+### Troubleshooting
 
-Create schema and seed:
+- Artifact not found
+  - The deploy job downloads artifacts produced in the same run. Do not set `repository`/`run-id` unless intentionally fetching another run
+  - Check that the build job completed and an artifact exists in the run summary
+- `./publish` missing (backend)
+  - Confirm publish targets `backend/Sherine.Api/Sherine.Api.csproj` and outputs to `./publish`
+  - The workflow lists contents of `./publish` before upload for quick diagnosis
+- NuGet fallback path error on Linux
+  - The CI `NuGet.config` disables Windows-only fallback folders; restore and publish reference it explicitly
+- `NETSDK1004: project.assets.json not found`
+  - The workflow restores the API project explicitly before publish
+- Next.js `useSearchParams must be wrapped in Suspense`
+  - `frontend/web/app/oauth-bridge/page.tsx` wraps hook usage inside `<Suspense>`
+- Frontend working directory errors
+  - Workflow uses `working-directory: ./frontend/web` so `npm` runs in the correct folder
 
-mysql -u root -p < infra/sql/001_schema.sql
-mysql -u root -p < infra/sql/002_seed.sql
+### Change Targets
 
+If you rename Azure apps, slots, or artifact names/paths, update these in the workflows:
 
-Set environment variable:
+- Backend: `app-name`, `slot-name`, and `package: ./publish`
+- Frontend: `app-name`, `slot-name`, and artifact name (`node-app`)
 
-# Linux/macOS
-export MYSQL_CONN="Server=localhost;Port=3306;Database=sherine;Uid=root;Pwd=root;SslMode=None;"
-
-# Windows PowerShell
-$env:MYSQL_CONN="Server=localhost;Port=3306;Database=sherine;Uid=root;Pwd=root;SslMode=None;"
-
-Option B: Docker MySQL
-cd infra/docker
-docker-compose up -d db
-
-5. Run with Docker (API + DB + Frontend)
-cd infra/docker
-docker-compose up --build
-
-
-API → http://localhost:5000/swagger
-
-Frontend → http://localhost:5173
-
-MySQL → localhost:3306 (user=root, pass=root)
-
-🤝 Team Workflow
-
-Branching: main (protected), dev, feat/<feature-name>
-
-PRs require 1 reviewer + green CI
-
-Commit style: feat(bookings): add quote endpoint
-
-✅ Sprint-1 Goal
-
-Backend: Auth + Vehicle list/create
-
-Frontend: Login + Vehicle page
-
-Infra: Docker Compose up with API + DB
-
-CI: GitHub Actions build + test
-
-📌 Notes
-
-Use .env for secrets (never commit real credentials).
-
-Update launchSettings.json in API to fix port conflicts.
-
-For MySQL errors, ensure DB is running and MYSQL_CONN is set.
-
-🚀 You are ready to start coding!
-
-
----
 
 ## ⚙️ CI/CD (GitHub Actions)
 
