@@ -48,12 +48,17 @@ jobs:
         run: |
           find backend -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} +
           dotnet restore backend/Sherine.sln --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
+          dotnet restore backend/Sherine.Api/Sherine.Api.csproj --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
+
+      - name: Verify restore assets
+        run: |
+          test -f backend/Sherine.Api/obj/project.assets.json && echo "assets ok" || (echo "missing project.assets.json" && ls -la backend/Sherine.Api/obj || true && exit 1)
 
       - name: Build with dotnet
         run: dotnet build backend/Sherine.sln -c Release --no-restore -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
 
       - name: dotnet publish
-        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --no-restore --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
+        run: dotnet publish backend/Sherine.Api/Sherine.Api.csproj -c Release -o ./publish --configfile ./NuGet.config -p:RestoreFallbackFolders= -p:RestoreAdditionalProjectFallbackFolders=
 
       - name: Verify publish output
         run: |
