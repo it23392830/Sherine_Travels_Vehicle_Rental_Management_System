@@ -1,3 +1,4 @@
+import path from 'path'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compiler: {
@@ -13,6 +14,13 @@ const nextConfig = {
     unoptimized: true,
   },
   output: "standalone",
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      ['@']: path.resolve(__dirname),
+    }
+    return config
+  },
   async rewrites() {
     const apiTarget = process.env.NEXT_PUBLIC_API_PROXY_TARGET;
     if (!apiTarget) return [];
