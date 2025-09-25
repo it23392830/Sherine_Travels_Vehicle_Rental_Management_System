@@ -56,6 +56,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C847DE4F6136468F91E4DDFE2A493C27 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A249DF3EC2E24CC7A4728AB74D7F3899 }}
 
+      - name: Wait for SCM to stabilize
+        run: sleep 20
+
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
