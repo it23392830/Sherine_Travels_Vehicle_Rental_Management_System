@@ -42,7 +42,7 @@ jobs:
           cp -r frontend/web/.next/standalone/* frontend/web/build_output/
           cp -r frontend/web/.next/static frontend/web/build_output/.next/
           if [ -d "frontend/web/public" ]; then cp -r frontend/web/public frontend/web/build_output/public; fi
-          cp frontend/web/package.json frontend/web/build_output/
+          # Do NOT copy package.json to avoid Oryx auto-build on the server
 
       - name: Verify runtime bundle contents
         run: |
