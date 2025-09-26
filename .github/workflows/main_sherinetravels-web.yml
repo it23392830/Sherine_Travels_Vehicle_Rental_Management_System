@@ -100,6 +100,5 @@ jobs:
           slot-name: 'Production'
           package: webapp.zip
           startup-command: 'node server.js'
-          enable-oryx-build: true
 
           
