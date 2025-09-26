@@ -13,8 +13,40 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Add DB (Postgres)
+static string BuildPostgresConnectionString(IConfiguration config)
+{
+    // Priority: ConnectionStrings:DefaultConnection → POSTGRESQLCONNSTR_DefaultConnection → DATABASE_URL
+    var fromConfig = config.GetConnectionString("DefaultConnection");
+    if (!string.IsNullOrWhiteSpace(fromConfig)) return fromConfig!;
+
+    var fromAzureConnStr = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
+    if (!string.IsNullOrWhiteSpace(fromAzureConnStr)) return fromAzureConnStr!;
+
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (!string.IsNullOrWhiteSpace(databaseUrl))
+    {
+        // Support URLs like: postgres://user:pass@host:5432/dbname
+        var uri = new Uri(databaseUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = Uri.UnescapeDataString(userInfo[0]);
+        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
+        var host = uri.Host;
+        var port = uri.Port <= 0 ? 5432 : uri.Port;
+        var db = uri.AbsolutePath.TrimStart('/');
+        return $"Host={host};Port={port};Database={db};Username={username};Password={password};SslMode=Require;Trust Server Certificate=true";
+    }
+
+    throw new InvalidOperationException("No PostgreSQL connection string found. Set ConnectionStrings:DefaultConnection or POSTGRESQLCONNSTR_DefaultConnection or DATABASE_URL.");
+}
+
+var connectionString = BuildPostgresConnectionString(configuration);
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString, npgsql =>
+    {
+        npgsql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+    }));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
