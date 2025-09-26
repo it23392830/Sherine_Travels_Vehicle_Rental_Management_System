@@ -8,6 +8,14 @@ import { Switch } from "@/components/ui/switch"
 import { apiFetch } from "@/lib/api"
 
 export default function SettingsPage() {
+  // Check for valid auth token and redirect if missing
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? window.localStorage.getItem("sherine_auth_token") : null;
+    if (!token) {
+      alert("You must be logged in as a manager to view this page.");
+      window.location.href = "/login";
+    }
+  }, []);
   const [darkMode, setDarkMode] = useState(false)
   const [notifications, setNotifications] = useState({
     email: true,

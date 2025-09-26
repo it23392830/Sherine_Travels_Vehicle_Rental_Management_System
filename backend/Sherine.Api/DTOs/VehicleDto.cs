@@ -6,8 +6,9 @@ namespace Sherine.Api.DTOs
     {
         public string Type { get; set; }
         public string Number { get; set; }
-        public decimal PriceWithDriver { get; set; }
-        public decimal PriceWithoutDriver { get; set; }
+    public decimal PricePerKmWithoutDriver { get; set; }
+    public decimal PricePerKmWithDriver { get; set; }
+    public decimal PriceForOvernight { get; set; }
         public int Seats { get; set; }
         public string Status { get; set; }
         public string? ImageUrl1 { get; set; }

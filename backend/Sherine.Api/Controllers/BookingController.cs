@@ -50,8 +50,9 @@ namespace Sherine.Api.Controllers
 
             // Calculate price
             var days = (dto.EndDate - dto.StartDate).Days + 1;
-            var basePrice = dto.WithDriver ? availableVehicle.PriceWithDriver : availableVehicle.PriceWithoutDriver;
-            var totalPrice = basePrice * days + (dto.Kilometers * 0.5m); // 0.5 per km
+            var perKmPrice = dto.WithDriver ? availableVehicle.PricePerKmWithDriver : availableVehicle.PricePerKmWithoutDriver;
+            var overnightPrice = availableVehicle.PriceForOvernight;
+            var totalPrice = (dto.Kilometers * perKmPrice) + (days > 1 ? overnightPrice * (days - 1) : 0);
 
             // Create booking
             var booking = new Booking
@@ -95,26 +96,38 @@ namespace Sherine.Api.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
+            // Reset vehicle status if booking is completed and end date has passed
+            var now = DateTime.UtcNow;
             var bookings = await _db.Bookings
                 .Include(b => b.Vehicle)
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.CreatedAt)
-                .Select(b => new BookingResponseDto
-                {
-                    Id = b.Id,
-                    BookingId = $"BK{b.Id:D6}",
-                    StartDate = b.StartDate,
-                    EndDate = b.EndDate,
-                    Kilometers = b.Kilometers,
-                    WithDriver = b.WithDriver,
-                    TotalPrice = b.TotalPrice,
-                    Status = b.Status,
-                    VehicleType = b.Vehicle!.Type,
-                    Message = ""
-                })
                 .ToListAsync();
 
-            return Ok(bookings);
+            foreach (var booking in bookings)
+            {
+                if (booking.Status == "Completed" && booking.EndDate < now && booking.Vehicle != null && booking.Vehicle.Status == "Booked")
+                {
+                    booking.Vehicle.Status = "Available";
+                }
+            }
+            await _db.SaveChangesAsync();
+
+            var response = bookings.Select(b => new BookingResponseDto
+            {
+                Id = b.Id,
+                BookingId = $"BK{b.Id:D6}",
+                StartDate = b.StartDate,
+                EndDate = b.EndDate,
+                Kilometers = b.Kilometers,
+                WithDriver = b.WithDriver,
+                TotalPrice = b.TotalPrice,
+                Status = b.Status,
+                VehicleType = b.Vehicle!.Type,
+                Message = ""
+            }).ToList();
+
+            return Ok(response);
         }
 
         // PUT: api/Booking/{id}/cancel

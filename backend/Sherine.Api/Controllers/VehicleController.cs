@@ -11,6 +11,33 @@ namespace Sherine.Api.Controllers
     [Route("api/[controller]")]
     public class VehicleController : ControllerBase
     {
+
+        // GET: api/vehicle/available?startDate=yyyy-MM-dd&endDate=yyyy-MM-dd
+        [HttpGet("available")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAvailableVehicles([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            // Ensure dates are UTC for Postgres compatibility
+            var startUtc = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+            var endUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+
+            // Get all vehicles
+            var allVehicles = await _context.Vehicles.ToListAsync();
+            var availableStatusVehicles = allVehicles.Where(v => v.Status == "Available").ToList();
+            // Get all bookings that overlap with the requested date range and are not cancelled
+            var bookedVehicleIds = await _context.Bookings
+                .Where(b => b.Status != "Cancelled" &&
+                    ((b.StartDate <= endUtc && b.EndDate >= startUtc)))
+                .Select(b => b.VehicleId)
+                .Distinct()
+                .ToListAsync();
+            // Debug logging
+            Console.WriteLine($"[DEBUG] Total vehicles: {allVehicles.Count}, 'Available' vehicles: {availableStatusVehicles.Count}, Booked vehicles for range: {bookedVehicleIds.Count}");
+            // Filter out booked vehicles
+            var available = availableStatusVehicles.Where(v => !bookedVehicleIds.Contains(v.Id)).ToList();
+            Console.WriteLine($"[DEBUG] Vehicles returned: {available.Count}");
+            return Ok(available);
+        }
         private readonly ApplicationDbContext _context;
 
         public VehicleController(ApplicationDbContext context)
@@ -75,8 +102,9 @@ namespace Sherine.Api.Controllers
             {
                 Type = dto.Type,
                 Number = dto.Number,
-                PriceWithDriver = dto.PriceWithDriver,
-                PriceWithoutDriver = dto.PriceWithoutDriver,
+                PricePerKmWithoutDriver = dto.PricePerKmWithoutDriver,
+                PricePerKmWithDriver = dto.PricePerKmWithDriver,
+                PriceForOvernight = dto.PriceForOvernight,
                 Seats = dto.Seats,
                 Status = dto.Status,
                 ImageUrl1 = saved1 ?? dto.ImageUrl1,
@@ -125,8 +153,9 @@ namespace Sherine.Api.Controllers
 
             vehicle.Type = dto.Type;
             vehicle.Number = dto.Number;
-            vehicle.PriceWithDriver = dto.PriceWithDriver;
-            vehicle.PriceWithoutDriver = dto.PriceWithoutDriver;
+            vehicle.PricePerKmWithoutDriver = dto.PricePerKmWithoutDriver;
+            vehicle.PricePerKmWithDriver = dto.PricePerKmWithDriver;
+            vehicle.PriceForOvernight = dto.PriceForOvernight;
             vehicle.Seats = dto.Seats;
             vehicle.Status = dto.Status;
             vehicle.ImageUrl1 = saved1 ?? dto.ImageUrl1 ?? vehicle.ImageUrl1;
