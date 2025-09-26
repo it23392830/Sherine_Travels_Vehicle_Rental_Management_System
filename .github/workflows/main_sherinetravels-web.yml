@@ -100,5 +100,6 @@ jobs:
           slot-name: 'Production'
           package: webapp.zip
           startup-command: 'node server.js'
+          type: zip
 
           
