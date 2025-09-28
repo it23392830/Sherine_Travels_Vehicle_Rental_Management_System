@@ -114,11 +114,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ✅ Always enable Swagger (Dev + Prod)
+// Always add Swagger
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "SherineTravels API v1");
-    c.RoutePrefix = "swagger"; // Swagger available at /swagger
+    c.RoutePrefix = string.Empty; // ✅ Serve Swagger UI at root "/"
 });
 
 // ✅ Enable HTTPS redirect only in Production
