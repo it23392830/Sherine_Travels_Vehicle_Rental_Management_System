@@ -31,11 +31,15 @@ jobs:
 
       - name: Prepare deployment package
         working-directory: ./frontend/web
-        run: zip -r ../webapp.zip .
+        run: |
+          mkdir -p ../deploy
+          cp -r .next next.config.js package.json public ../deploy
+          cd ../deploy
+          zip -r ../webapp.zip .
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'sherinetravels-web'
           slot-name: 'Production'
-          package: ./webapp.zip
+          package: ./frontend/deploy/webapp.zip
