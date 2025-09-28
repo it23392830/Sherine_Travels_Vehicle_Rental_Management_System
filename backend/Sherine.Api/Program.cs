@@ -113,13 +113,15 @@ using (var scope = app.Services.CreateScope())
     await initializer.SeedRolesAndAdminAsync(); // Seed roles + Owner + Manager
 }
 
-if (app.Environment.IsDevelopment())
+// ✅ Always enable Swagger (Dev + Prod)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    // In development, allow HTTP without redirect to simplify local frontend calls
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SherineTravels API v1");
+    c.RoutePrefix = "swagger"; // Swagger available at /swagger
+});
 
+// ✅ Enable HTTPS redirect only in Production
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
