@@ -1,105 +1,41 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - sherinetravels-web
+name: Build and Deploy Next.js Frontend to Azure
 
 on:
   push:
     branches:
-      - main
+      - main   # change if your frontend branch is different
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'frontend/web/package-lock.json'
 
-      - name: Install deps
-        run: |
-          npm ci --prefer-offline --no-audit --progress=false
+      - name: Install dependencies
         working-directory: ./frontend/web
+        run: npm ci
 
-      - name: Build Next.js (standalone)
-        run: |
-          npm run build
-          test -d .next/standalone || (echo ".next/standalone missing" && exit 1)
+      - name: Build Next.js app
         working-directory: ./frontend/web
+        run: npm run build
 
-      - name: Assemble minimal runtime bundle
-        run: |
-          mkdir -p frontend/web/build_output/.next
-          cp -r frontend/web/.next/standalone/* frontend/web/build_output/
-          cp -r frontend/web/.next/static frontend/web/build_output/.next/
-          if [ -d "frontend/web/public" ]; then cp -r frontend/web/public frontend/web/build_output/public; fi
-          # Do NOT copy package.json to avoid Oryx auto-build on the server
+      - name: Prepare deployment package
+        working-directory: ./frontend/web
+        run: zip -r ../webapp.zip .
 
-      - name: Verify runtime bundle contents
-        run: |
-          echo "Listing build_output (top-level)" && ls -la frontend/web/build_output | cat
-          echo "Listing .next inside build_output" && ls -la frontend/web/build_output/.next | cat
-
-      - name: Create deployment zip (build_output only)
-        run: |
-          cd frontend/web/build_output
-          zip -q -r ../../../webapp.zip .
-
-      - name: Verify deployment zip contents
-        run: unzip -l webapp.zip | head -200 | cat
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: webapp.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-          path: .
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_8FBB5ED0D0394CFCB6AC1898B222BD7D }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C847DE4F6136468F91E4DDFE2A493C27 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A249DF3EC2E24CC7A4728AB74D7F3899 }}
-
-      - name: Warm up SCM
-        run: |
-          curl -sS "https://sherinetravels-web-b5fad5ccazdgffak.scm.eastasia-01.azurewebsites.net/api/deployments" || true
-          sleep 10
-
-      - name: Wait for SCM to stabilize
-        run: sleep 45
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'sherinetravels-web'
           slot-name: 'Production'
-          package: webapp.zip
-          startup-command: 'node server.js'
-          type: zip
-
-          
+          package: ./webapp.zip
