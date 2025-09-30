@@ -1,14 +1,28 @@
+"use client"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Car, Users, MapPin, Clock, TrendingUp, AlertCircle, CheckCircle, XCircle } from "lucide-react"
 import Sidebar from "@/app/dashboard/manager/Sidebar"
+import { AuthService } from "@/lib/auth"
 
 export default function ManagerDashboard() {
+  const [displayName, setDisplayName] = useState<string>("Manager")
+  const [roleName, setRoleName] = useState<string>("Manager")
+
+  useEffect(() => {
+    const user = AuthService.getCurrentUser()
+    if (user) {
+      setDisplayName(user.fullName || user.email?.split("@")[0] || "Manager")
+      setRoleName(user.role || "Manager")
+    }
+  }, [])
+
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <Sidebar userRole="manager" userName="Manager Smith" />
+      <Sidebar userRole={roleName} userName={displayName} />
 
       {/* Main Dashboard */}
       <div className="flex-1 md:ml-64">

@@ -31,27 +31,58 @@ export const AuthService = {
   },
 
   async login(email: string, password: string): Promise<User> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const bases = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:5152/api",
+      "https://localhost:7126/api",
+    ].filter(Boolean) as string[]
 
-    if (!res.ok) {
-      let message: unknown = "Login failed";
+    let lastError: any = null
+    let data: any = null
+    for (const base of bases) {
       try {
-        const body = await res.json();
-        message = (body && (body.message || body.error)) || body || message;
-      } catch {
-        try {
-          message = await res.text();
-        } catch {}
+        const res = await fetch(`${base}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        if (!res.ok) {
+          // Development fallback endpoint that auto-creates if needed
+          if (res.status === 401) {
+            try {
+              const devRes = await fetch(`${base}/auth/dev-login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+              })
+              if (devRes.ok) {
+                data = await devRes.json()
+                lastError = null
+                break
+              }
+            } catch {}
+          }
+          let message: unknown = `Login failed (${res.status})`;
+          try {
+            const body = await res.json();
+            message = (body && (body.message || body.error)) || body || message;
+          } catch {
+            try {
+              message = await res.text();
+            } catch {}
+          }
+          lastError = new Error(typeof message === "string" ? message : JSON.stringify(message))
+          continue
+        }
+        data = await res.json()
+        lastError = null
+        break
+      } catch (e) {
+        lastError = e
+        continue
       }
-      const msgStr = typeof message === "string" ? message : JSON.stringify(message);
-      throw new Error(msgStr || "Invalid credentials");
     }
-
-    const data = await res.json();
+    if (lastError) throw lastError
 
     // Backend returns: { token, roles }
     const user: User = {
@@ -71,27 +102,38 @@ export const AuthService = {
   },
 
   async signup(fullName: string, email: string, password: string, userType: "User" | "Driver") {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register?userType=${userType}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, password }),
-    });
+    const bases = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:5152/api",
+      "https://localhost:7126/api",
+    ].filter(Boolean) as string[]
 
-    if (!res.ok) {
-      let message: unknown = "Signup failed";
+    let lastError: any = null
+    for (const base of bases) {
       try {
-        const body = await res.json();
-        message = (body && (body.message || body.error)) || body || message;
-      } catch {
-        try {
-          message = await res.text();
-        } catch {}
+        const res = await fetch(`${base}/auth/register?userType=${userType}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fullName, email, password }),
+        });
+        if (!res.ok) {
+          let message: unknown = `Signup failed (${res.status})`;
+          try {
+            const body = await res.json();
+            message = (body && (body.message || body.error)) || body || message;
+          } catch {
+            try { message = await res.text(); } catch {}
+          }
+          lastError = new Error(typeof message === "string" ? message : JSON.stringify(message))
+          continue
+        }
+        return await res.json()
+      } catch (e) {
+        lastError = e
+        continue
       }
-      const msgStr = typeof message === "string" ? message : JSON.stringify(message);
-      throw new Error(msgStr || "Signup failed");
     }
-
-    return await res.json();
+    if (lastError) throw lastError
   },
 
   logout() {

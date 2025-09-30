@@ -188,12 +188,75 @@ ls -la ./publish
 Frontend:
 ```bash
 cd frontend/web
-npm ci || npm install
-npm run build
-```
+npm install
+npm run dev
 
-### Azure App Service Targets
-- API: `sherinetravels-api` (Production slot)
-- Web: `sherinetravels-web` (Production slot)
 
-If you change app names or slots, update the corresponding `app-name`, `slot-name`, and artifact paths in the workflow files.
+Open: http://localhost:5173
+
+Dependencies
+
+Node.js 20+
+
+4. Database (MySQL)
+Option A: Local MySQL
+
+Create schema and seed:
+
+mysql -u root -p < infra/sql/001_schema.sql
+mysql -u root -p < infra/sql/002_seed.sql
+
+
+Set environment variable:
+
+# Linux/macOS
+export MYSQL_CONN="Server=localhost;Port=3306;Database=sherine;Uid=root;Pwd=root;SslMode=None;"
+
+# Windows PowerShell
+$env:MYSQL_CONN="Server=localhost;Port=3306;Database=sherine;Uid=root;Pwd=root;SslMode=None;"
+
+Option B: Docker MySQL
+cd infra/docker
+docker-compose up -d db
+
+5. Run with Docker (API + DB + Frontend)
+cd infra/docker
+docker-compose up --build
+
+
+API → http://localhost:5000/swagger
+
+Frontend → http://localhost:5173
+
+MySQL → localhost:3306 (user=root, pass=root)
+
+🤝 Team Workflow
+
+Branching: main (protected), dev, feat/<feature-name>
+
+PRs require 1 reviewer + green CI
+
+Commit style: feat(bookings): add quote endpoint
+
+✅ Sprint-1 Goal
+
+Backend: Auth + Vehicle list/create
+
+Frontend: Login + Vehicle page
+
+Infra: Docker Compose up with API + DB
+
+CI: GitHub Actions build + test
+
+📌 Notes
+
+Use .env for secrets (never commit real credentials).
+
+Update launchSettings.json in API to fix port conflicts.
+
+For MySQL errors, ensure DB is running and MYSQL_CONN is set.
+
+🚀 You are ready to start coding!
+
+
+---

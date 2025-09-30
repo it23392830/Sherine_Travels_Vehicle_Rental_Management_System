@@ -14,14 +14,17 @@ namespace Sherine.Api.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITokenService _tokenService;
+        private readonly IHostEnvironment _env;
 
         public AuthController(UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            IHostEnvironment env)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _env = env;
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Sherine.Api.Controllers
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            // ✅ Only allow User or Driver at registration
+            //  Only allow User or Driver at registration
             var role = userType.Equals("Driver", StringComparison.OrdinalIgnoreCase) ? "Driver" : "User";
 
             if (!await _roleManager.RoleExistsAsync(role))
@@ -73,6 +76,53 @@ namespace Sherine.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = await _tokenService.CreateTokenAsync(user, roles);
 
+            return Ok(new { token, roles });
+        }
+
+        /// <summary>
+        /// Development-only login helper: creates user if missing and returns token without strict checks.
+        /// </summary>
+        [HttpPost("dev-login")]
+        public async Task<IActionResult> DevLogin([FromBody] LoginDto dto)
+        {
+            if (!_env.IsDevelopment()) return NotFound();
+
+            var email = dto.Email;
+            var password = dto.Password;
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                return BadRequest("Email and password required");
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser { Email = email, UserName = email, FullName = email };
+                var createRes = await _userManager.CreateAsync(user, password);
+                if (!createRes.Succeeded)
+                {
+                    // if creation failed due to password complexity, create without password
+                    var createNoPass = await _userManager.CreateAsync(user);
+                    if (!createNoPass.Succeeded) return Unauthorized("Unable to create dev user");
+                    // set a known password
+                    await _userManager.RemovePasswordAsync(user);
+                    await _userManager.AddPasswordAsync(user, password);
+                }
+                // Assign role based on email hint; default User
+                var role = email.Contains("manager") ? "Manager" : email.Contains("owner") ? "Owner" : "User";
+                if (!await _roleManager.RoleExistsAsync(role)) await _roleManager.CreateAsync(new IdentityRole(role));
+                await _userManager.AddToRoleAsync(user, role);
+            }
+            else
+            {
+                // ensure password works
+                if (!await _userManager.CheckPasswordAsync(user, password))
+                {
+                    await _userManager.RemovePasswordAsync(user);
+                    await _userManager.AddPasswordAsync(user, password);
+                }
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = await _tokenService.CreateTokenAsync(user, roles);
             return Ok(new { token, roles });
         }
 
