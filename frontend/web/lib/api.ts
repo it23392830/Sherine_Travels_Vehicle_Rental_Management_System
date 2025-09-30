@@ -9,18 +9,7 @@ export async function apiFetch<T = any>(
   path: string,
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL as string;
-  if (!baseUrl) {
-    const configHelp =
-      'Missing NEXT_PUBLIC_API_URL. Set it in frontend/web/.env.local (e.g., NEXT_PUBLIC_API_URL=http://localhost:5152/api) and restart dev server.'
-    const error = new Error(configHelp)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    error.code = 'CONFIG_MISSING_API_URL'
-    // eslint-disable-next-line no-console
-    console.error('apiFetch config error:', { message: error.message })
-    throw error
-  }
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL as string) || "/api";
   const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
   const headers: HeadersInit = {

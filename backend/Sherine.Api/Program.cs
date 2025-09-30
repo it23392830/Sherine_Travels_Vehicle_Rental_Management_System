@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,20 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- Configuration ---
 var configuration = builder.Configuration;
-var environment = builder.Environment;
 
-// Add DB (Postgres by default; optional SQLite dev fallback)
-var useSqliteDev = configuration.GetValue<bool>("UseSqliteDev");
-if (environment.IsDevelopment() && useSqliteDev)
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite(configuration.GetConnectionString("SqliteConnection") ?? "Data Source=dev.db"));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-}
+// Add DB (Postgres)
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -66,24 +57,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ Add CORS
+// ✅ Add CORS (origins from config, fallback to localhost)
+var allowedOrigins = configuration.GetValue<string>("FrontendOrigins") ?? "http://localhost:3000";
+var allowedOriginsArray = allowedOrigins
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            if (environment.IsDevelopment())
-            {
-                // In development, allow any origin to simplify local testing across ports
-                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-            }
-            else
-            {
-                policy.WithOrigins("http://localhost:3000")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
-            }
-        });
+        policy => policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
 });
 
 var app = builder.Build();
@@ -107,13 +91,16 @@ using (var scope = app.Services.CreateScope())
     await initializer.SeedRolesAndAdminAsync(); // Seed roles + Owner + Manager
 }
 
-if (app.Environment.IsDevelopment())
+// ✅ Always enable Swagger (Dev + Prod)
+// Always add Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    // In development, allow HTTP without redirect to simplify local frontend calls
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SherineTravels API v1");
+    c.RoutePrefix = string.Empty; // ✅ Serve Swagger UI at root "/"
+});
 
+// ✅ Enable HTTPS redirect only in Production
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
