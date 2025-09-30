@@ -76,16 +76,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (environment.IsDevelopment() && useSqliteDev)
-    {
-        // For SQLite in dev, force recreate schema to reflect latest model
-        db.Database.EnsureDeleted();
-        db.Database.EnsureCreated();
-    }
-    else
-    {
-        db.Database.Migrate(); // Apply any pending migrations
-    }
+    db.Database.Migrate(); // Apply any pending migrations
 
     var initializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
     await initializer.SeedRolesAndAdminAsync(); // Seed roles + Owner + Manager

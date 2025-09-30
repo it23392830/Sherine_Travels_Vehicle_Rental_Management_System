@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9iWTgdTe42s=",
+  "dgSpecHash": "Fnblk7byIec=",
   "success": true,
-  "projectFilePath": "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.APi\\Sherine.Api.csproj",
+  "projectFilePath": "D:\\SLIIT\\Y3S1\\CSP\\Project\\Sherine_Travels_Vehicle_Rental_Management_System\\backend\\Sherine.Api\\Sherine.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\9.0.8\\microsoft.aspnetcore.authentication.jwtbearer.9.0.8.nupkg.sha512",
