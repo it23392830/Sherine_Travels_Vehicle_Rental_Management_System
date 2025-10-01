@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sherine.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51ddfcc7357d7ecdd9cae8b4fba5a80e765fb603")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fd7a0ab554710944a8dcfa6dab37d6f0ba93dbbd")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sherine.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sherine.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -21,6 +21,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/web/package-lock.json'
 
+      - name: Verify package-lock.json exists
+        working-directory: ./frontend/web
+        run: |
+          ls -la package-lock.json
+          echo "Package-lock.json found, proceeding with npm ci"
+      
       - name: Install dependencies
         working-directory: ./frontend/web
         run: npm ci
