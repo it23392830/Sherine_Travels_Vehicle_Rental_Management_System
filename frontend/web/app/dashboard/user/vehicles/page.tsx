@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Sidebar from "@/app/dashboard/user/Sidebar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -18,7 +18,7 @@ interface Vehicle {
   imageUrl2?: string | null
 }
 
-export default function AllVehiclesPage() {
+function AllVehiclesContent() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({})
   const router = useRouter()
@@ -146,6 +146,14 @@ export default function AllVehiclesPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function AllVehiclesPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <AllVehiclesContent />
+    </Suspense>
   )
 }
 

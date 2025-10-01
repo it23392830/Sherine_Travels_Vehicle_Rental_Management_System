@@ -1,10 +1,11 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-export default function PaymentPlaceholderPage() {
+function PaymentContent() {
   const params = useSearchParams()
   const router = useRouter()
   const bookingId = params.get("bookingId")
@@ -23,5 +24,11 @@ export default function PaymentPlaceholderPage() {
   )
 }
 
-
+export default function PaymentPlaceholderPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <PaymentContent />
+    </Suspense>
+  )
+}
 

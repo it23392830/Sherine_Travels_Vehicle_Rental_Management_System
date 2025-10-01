@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ const vehicle = {
   priceForOvernight: 2000,
 };
 
-export default function BookingsPage() {
+function BookingsPageContent() {
   const router = useRouter();
   // Use Next.js useSearchParams hook for reliable query param access
   const searchParams = useSearchParams();
@@ -179,5 +179,13 @@ export default function BookingsPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+export default function BookingsPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <BookingsPageContent />
+    </Suspense>
   );
 }
