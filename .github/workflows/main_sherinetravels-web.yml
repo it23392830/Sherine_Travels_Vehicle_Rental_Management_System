@@ -39,7 +39,9 @@ jobs:
         working-directory: ./frontend/web
         run: |
           mkdir -p ../deploy
-          cp -r .next next.config.js package.json public ../deploy
+          cp -r .next package.json public ../deploy
+          [ -f next.config.mjs ] && cp next.config.mjs ../deploy || true
+          [ -f next.config.js ] && cp next.config.js ../deploy || true
           cd ../deploy
           zip -r ../webapp.zip .
 
