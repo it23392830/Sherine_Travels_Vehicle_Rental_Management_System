@@ -67,17 +67,25 @@ export default function UserDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Link href="/dashboard/user/bookingride">
-                  <Button className="h-20 flex flex-col items-center justify-center">Book Ride</Button>
+                <Link href="/dashboard/user/bookride">
+                  <div className="border border-neutral-300 rounded-lg p-1 flex items-center justify-center h-20 bg-background">
+                    <Button className="h-16 w-full flex flex-col items-center justify-center">Book Ride</Button>
+                  </div>
                 </Link>
                 <Link href="/dashboard/user/cancelride">
-                  <Button className="h-20 flex flex-col items-center justify-center">Cancel Ride</Button>
+                  <div className="border border-neutral-300 rounded-lg p-1 flex items-center justify-center h-20 bg-background">
+                    <Button className="h-16 w-full flex flex-col items-center justify-center">Cancel Ride</Button>
+                  </div>
                 </Link>
                 <Link href="/dashboard/user/payonline">
-                  <Button className="h-20 flex flex-col items-center justify-center">Pay Online</Button>
+                  <div className="border border-neutral-300 rounded-lg p-1 flex items-center justify-center h-20 bg-background">
+                    <Button className="h-16 w-full flex flex-col items-center justify-center">Pay Online</Button>
+                  </div>
                 </Link>
                 <Link href="/dashboard/user/downloadinvoice">
-                  <Button className="h-20 flex flex-col items-center justify-center">Download Invoice</Button>
+                  <div className="border border-neutral-300 rounded-lg p-1 flex items-center justify-center h-20 bg-background">
+                    <Button className="h-16 w-full flex flex-col items-center justify-center">Download Invoice</Button>
+                  </div>
                 </Link>
               </div>
             </CardContent>
