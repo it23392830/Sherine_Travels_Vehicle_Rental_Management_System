@@ -22,9 +22,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for existing session on mount
-    const currentUser = AuthService.getCurrentUser()
-    setUser(currentUser)
-    setIsLoading(false)
+    try {
+      const currentUser = AuthService.getCurrentUser()
+      setUser(currentUser)
+    } catch (error) {
+      // Handle any errors silently
+      setUser(null)
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
