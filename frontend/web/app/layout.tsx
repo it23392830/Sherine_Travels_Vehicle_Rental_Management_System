@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import { AuthProvider } from "../hooks/use-auth"
-import { AppSessionProvider } from "@/components/auth/session-provider"
+import NoSSR from "@/components/no-ssr"
 
 export const metadata: Metadata = {
   title: "Sherine_Travels",
@@ -17,18 +17,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <style>{`
-html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-}
-        `}</style>
+        <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body suppressHydrationWarning={true}>
-        <AppSessionProvider>
+        <NoSSR 
+          fallback={
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+              <p className="mt-4 text-gray-600">Loading Sherine Travels...</p>
+            </div>
+          }
+        >
           <AuthProvider>
             {children}
           </AuthProvider>
-        </AppSessionProvider>
+        </NoSSR>
       </body>
     </html>
   )
