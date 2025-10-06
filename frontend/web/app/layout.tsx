@@ -16,13 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <style>{`
-html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-}
-        `}</style>
-      </head>
+      
       <body suppressHydrationWarning={true}>
         <AppSessionProvider>
           <AuthProvider>

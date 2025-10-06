@@ -23,7 +23,7 @@ interface Vehicle {
 }
 
 // ✅ API base from .env.local
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5152/api"
 
 export default function AssignDriversPage() {
     const isFormEmpty = () => {
