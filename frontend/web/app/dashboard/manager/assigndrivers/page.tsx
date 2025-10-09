@@ -23,7 +23,7 @@ interface Vehicle {
 }
 
 // ✅ API base from .env.local
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function AssignDriversPage() {
     const isFormEmpty = () => {
@@ -51,6 +51,10 @@ export default function AssignDriversPage() {
 
     const loadData = async () => {
         const token = localStorage.getItem("sherine_auth_token")
+        if (!API_BASE) {
+            console.error("NEXT_PUBLIC_API_BASE_URL is not configured")
+            return
+        }
         // Fetch drivers first
         let fetchedDrivers: Driver[] = []
 		try {
