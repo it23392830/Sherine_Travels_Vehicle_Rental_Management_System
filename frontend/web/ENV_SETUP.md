@@ -2,7 +2,7 @@
 
 ## Required Environment Variables
 
-### NEXT_PUBLIC_API_BASE_URL
+### 1. NEXT_PUBLIC_API_BASE_URL
 The base URL for your backend API.
 
 **Local Development:**
@@ -10,6 +10,37 @@ Create a `.env.local` file in the `frontend/web` directory:
 ```
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
 ```
+
+### 2. Google OAuth Configuration (Required for "Sign in with Google")
+
+You need to set up Google OAuth credentials and configure the following environment variables:
+
+**Required Variables:**
+```
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXTAUTH_SECRET=your-random-secret-key-here
+NEXTAUTH_URL=https://your-frontend-url.azurestaticapps.net
+```
+
+**How to Get Google OAuth Credentials:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Navigate to **APIs & Services** → **Credentials**
+4. Click **Create Credentials** → **OAuth 2.0 Client ID**
+5. Configure OAuth consent screen if not done
+6. Select **Web application** as application type
+7. Add authorized redirect URIs:
+   - For local: `http://localhost:3000/api/auth/callback/google`
+   - For Azure: `https://your-frontend-url.azurestaticapps.net/api/auth/callback/google`
+8. Copy the **Client ID** and **Client Secret**
+
+**Generate NEXTAUTH_SECRET:**
+Run this command in terminal:
+```bash
+openssl rand -base64 32
+```
+Or use any random string generator (minimum 32 characters)
 
 **Azure Deployment:**
 1. Go to Azure Portal → Your App Service
