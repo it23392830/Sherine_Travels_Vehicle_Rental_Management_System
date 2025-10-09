@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Sidebar from "@/app/dashboard/user/Sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { apiFetch } from "@/lib/api"
+import { useRouter } from "next/navigation"
 
 interface BookingItem {
   id: number
@@ -15,6 +16,7 @@ interface BookingItem {
   withDriver: boolean
   totalPrice: number
   status: string
+  paymentStatus: string
   vehicleType: string
 }
 
@@ -24,10 +26,11 @@ export default function MyBookingsPage() {
   const [cancelId, setCancelId] = useState<number | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [loadingCancel, setLoadingCancel] = useState(false)
+  const router = useRouter()
 
   const loadBookings = async () => {
     try {
-      const data = await apiFetch<BookingItem[]>("/booking")
+      const data = await apiFetch<BookingItem[]>("/api/Booking")
       setBookings(data)
     } catch (e: any) {
       setError(e?.message || "Failed to load bookings")
@@ -47,7 +50,7 @@ export default function MyBookingsPage() {
     setLoadingCancel(true)
     setError("")
     try {
-      await apiFetch(`/booking/${cancelId}/cancel`, { method: "PUT" })
+      await apiFetch(`/api/Booking/${cancelId}/cancel`, { method: "PUT" })
       setConfirmOpen(false)
       setCancelId(null)
       await loadBookings()
@@ -73,14 +76,30 @@ export default function MyBookingsPage() {
               <CardContent className="space-y-1">
                 <p>Dates: {new Date(b.startDate).toLocaleDateString()} → {new Date(b.endDate).toLocaleDateString()}</p>
                 <p>Kilometers: {b.kilometers}</p>
-                <p>Total: LKR {b.totalPrice}</p>
-                <p>Status: {b.status}</p>
-                <p>Driver: Pending</p>
-                {['Pending','Confirmed'].includes(b.status) && (
-                  <Button variant="destructive" size="sm" onClick={() => handleCancelClick(b.id)} disabled={loadingCancel}>
-                    Cancel Booking
-                  </Button>
-                )}
+                <p>Total: LKR {b.totalPrice.toLocaleString()}</p>
+                <p>Status: <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  (b.status === 'Confirmed' || b.status === 'Confirmed pending payment') ? 'bg-green-100 text-green-800' :
+                  b.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>{b.status}</span></p>
+                <p>Payment: <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  b.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' :
+                  b.paymentStatus === 'PayAtPickup' ? 'bg-blue-100 text-blue-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>{b.paymentStatus}</span></p>
+                <p>Driver: {b.withDriver ? 'Included' : 'Not Required'}</p>
+                <div className="flex gap-2">
+                  {['Pending','Confirmed','Confirmed pending payment'].includes(b.status) && (
+                    <Button variant="destructive" size="sm" onClick={() => handleCancelClick(b.id)} disabled={loadingCancel}>
+                      Cancel Booking
+                    </Button>
+                  )}
+                  {b.paymentStatus === 'Pending' && (
+                    <Button size="sm" onClick={() => router.push(`/dashboard/user/payment?bookingId=${encodeURIComponent(b.bookingId)}`)}>
+                      Pay Now
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}

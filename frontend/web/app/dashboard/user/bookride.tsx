@@ -35,12 +35,13 @@
     }
   ];
   // Calculate number of nights
+  // For rental: if start is Jan 1 and end is Jan 3, that's 2 nights (Jan 1-2, Jan 2-3)
   function getNights() {
     if (!startDate || !endDate) return 0;
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diff = end.getTime() - start.getTime();
-    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
+    return diff > 0 ? Math.floor(diff / (1000 * 60 * 60 * 24)) : 0;
   }
   const nights = getNights();
 import { useState } from "react";
@@ -133,6 +134,7 @@ export default function BookRidePage() {
       return;
     }
   setDateError("");
+  // For rental: if start is Jan 1 and end is Jan 3, that's 2 nights (Jan 1-2, Jan 2-3)
   const nightsVal = Math.max(0, Math.floor((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)));
   setNights(nightsVal);
   setOvernightPrice(selectedVehicle ? nightsVal * selectedVehicle.priceForOvernight : 0);

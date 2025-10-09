@@ -52,20 +52,19 @@ builder.Services.AddAuthentication(options =>
 // Application services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddScoped<IPayPalService, PayPalService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // ✅ Add CORS (origins from config, fallback to localhost)
-var allowedOrigins = configuration.GetValue<string>("FrontendOrigins") ?? "http://localhost:3000";
-var allowedOriginsArray = allowedOrigins
-    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000")
+        policy => policy.WithOrigins("http://localhost:3000", "https://ashy-glacier-0141e1700.2.azurestaticapps.net") // Add production URL
                         .AllowAnyHeader()
                         .AllowAnyMethod());
 });
