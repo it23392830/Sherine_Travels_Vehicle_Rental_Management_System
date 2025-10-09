@@ -9,7 +9,7 @@ export async function apiFetch<T = any>(
   path: string,
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL as string) || "/api";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
   const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
   const headers: HeadersInit = {
@@ -58,5 +58,9 @@ export async function apiFetch<T = any>(
 }
 
 export const fetcher = (url: string) => apiFetch(url);
+
+export function getApiBaseUrl() {
+  return (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
+}
 
 

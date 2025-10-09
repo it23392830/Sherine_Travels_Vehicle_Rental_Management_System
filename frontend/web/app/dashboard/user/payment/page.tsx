@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import Sidebar from "@/app/dashboard/user/Sidebar"
 import { apiFetch } from "@/lib/api"
+import Script from "next/script"
 
 interface BookingDetails {
   id: number
@@ -29,6 +30,7 @@ function PaymentContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [processing, setProcessing] = useState(false)
+  const [sdkReady, setSdkReady] = useState(false)
 
   useEffect(() => {
     if (!bookingId) {
@@ -56,25 +58,61 @@ function PaymentContent() {
     fetchBooking()
   }, [bookingId])
 
-  const handlePayment = async () => {
-    if (!booking) return
-    
-    setProcessing(true)
-    try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Mark booking as paid in backend
-      await apiFetch(`/booking/${booking.id}/pay`, { method: "PUT" })
+  const handlePayPalButtons = () => {
+    if (!(window as any).paypal || !booking) return
+    const paypal = (window as any).paypal
+    const containerId = `paypal-buttons-${booking.id}`
+    const container = document.getElementById(containerId)
+    if (!container) return
+    container.innerHTML = ""
 
-      alert("Payment processed successfully! You will receive a confirmation email shortly.")
-      router.push("/dashboard/user/mybookings")
-    } catch (err) {
-      setError("Payment failed. Please try again.")
-    } finally {
-      setProcessing(false)
-    }
+    const fundingSources = [
+      paypal.FUNDING.IDEAL,
+      paypal.FUNDING.BANCONTACT,
+      paypal.FUNDING.BLIK,
+      paypal.FUNDING.EPS,
+      paypal.FUNDING.P24,
+      paypal.FUNDING.SOFORT,
+      paypal.FUNDING.MYBANK,
+      paypal.FUNDING.SEPA,
+      paypal.FUNDING.PAYPAL, // wallet fallback
+    ]
+
+    fundingSources.forEach((source: any) => {
+      if (!paypal.isFundingEligible || !paypal.isFundingEligible(source)) return
+      const btn = paypal.Buttons({
+        fundingSource: source,
+        createOrder: async () => {
+          const { orderId } = await apiFetch<{ orderId: string }>(`/booking/${booking.id}/paypal/create`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: booking.totalPrice - 0, currency: "PHP" }),
+          })
+          return orderId
+        },
+        onApprove: async (data: any) => {
+          try {
+            await apiFetch(`/booking/${booking.id}/paypal/capture?orderId=${data.orderID}`, { method: "POST" })
+            router.push(`/dashboard/user/payment-success?bookingId=${encodeURIComponent(booking.bookingId)}`)
+          } catch (e: any) {
+            setError(e?.message || "Failed to capture payment")
+          }
+        },
+        onError: (err: any) => {
+          setError(err?.message || "PayPal error")
+        },
+      })
+      if (btn.isEligible()) {
+        btn.render(`#${containerId}`)
+      }
+    })
   }
+
+  useEffect(() => {
+    if (sdkReady && booking) {
+      handlePayPalButtons()
+    }
+  }, [sdkReady, booking])
 
   if (loading) {
     return (
@@ -152,41 +190,9 @@ function PaymentContent() {
             <CardContent>
               <div className="space-y-4">
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-2">Credit/Debit Card</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Secure payment processing powered by our payment gateway
-                  </p>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Card Number</label>
-                      <input
-                        type="text"
-                        placeholder="1234 5678 9012 3456"
-                        className="w-full border rounded p-2"
-                        disabled
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Expiry Date</label>
-                        <input
-                          type="text"
-                          placeholder="MM/YY"
-                          className="w-full border rounded p-2"
-                          disabled
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">CVV</label>
-                        <input
-                          type="text"
-                          placeholder="123"
-                          className="w-full border rounded p-2"
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <h3 className="font-semibold mb-2">PayPal</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Checkout with Visa/Master via PayPal Sandbox</p>
+                  <div id={`paypal-buttons-${booking.id}`} />
                 </div>
 
                 {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -200,21 +206,15 @@ function PaymentContent() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    onClick={handlePayment}
-                    disabled={processing}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    {processing ? "Processing..." : `Pay LKR ${booking.totalPrice.toLocaleString()}`}
-                  </Button>
                 </div>
-
-                <p className="text-xs text-muted-foreground text-center">
-                  This is a demo payment interface. In production, this would integrate with a real payment gateway.
-                </p>
               </div>
             </CardContent>
           </Card>
+          <Script
+            src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=PHP&intent=capture&enable-funding=ideal,bancontact,blik,eps,p24,sofort,mybank,sepa&disable-funding=card`}
+            strategy="afterInteractive"
+            onLoad={() => setSdkReady(true)}
+          />
         </div>
       </div>
     </div>

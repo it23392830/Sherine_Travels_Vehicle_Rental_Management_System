@@ -52,6 +52,9 @@ builder.Services.AddAuthentication(options =>
 // Application services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddScoped<IPayPalService, PayPalService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

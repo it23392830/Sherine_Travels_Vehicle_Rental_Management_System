@@ -239,12 +239,12 @@ namespace Sherine.Api.Migrations
                     b.Property<int>("Kilometers")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("PaidAmount")
-                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
