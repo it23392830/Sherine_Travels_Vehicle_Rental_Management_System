@@ -27,7 +27,7 @@ export default function MyBookingsPage() {
 
   const loadBookings = async () => {
     try {
-      const data = await apiFetch<BookingItem[]>("/booking")
+      const data = await apiFetch<BookingItem[]>("/api/Booking")
       setBookings(data)
     } catch (e: any) {
       setError(e?.message || "Failed to load bookings")
@@ -47,7 +47,7 @@ export default function MyBookingsPage() {
     setLoadingCancel(true)
     setError("")
     try {
-      await apiFetch(`/booking/${cancelId}/cancel`, { method: "PUT" })
+      await apiFetch(`/api/Booking/${cancelId}/cancel`, { method: "PUT" })
       setConfirmOpen(false)
       setCancelId(null)
       await loadBookings()

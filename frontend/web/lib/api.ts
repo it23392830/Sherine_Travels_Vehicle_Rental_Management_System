@@ -9,7 +9,7 @@ export async function apiFetch<T = any>(
   path: string,
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL as string) || "/api";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
   const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
   const headers: HeadersInit = {

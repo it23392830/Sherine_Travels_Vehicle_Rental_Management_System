@@ -25,7 +25,7 @@ function OAuthBridgeWorker() {
         const requestedRoleParam = searchParams?.get("role")
         const requestedRole = requestedRoleParam === "Driver" ? "Driver" : "User"
         const { token, roles } = await apiFetch<{ token: string; roles: string[] }>(
-          "/auth/oauth",
+          "/api/Auth/oauth",
           {
             method: "POST",
             body: JSON.stringify({ provider: "google", email, fullName: name, requestedRole }),

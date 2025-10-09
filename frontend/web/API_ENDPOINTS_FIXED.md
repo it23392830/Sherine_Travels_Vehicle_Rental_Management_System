@@ -51,13 +51,41 @@ The frontend was calling incorrect API endpoints, resulting in 404 errors. The b
 - ❌ Old: `/driver/{id}` (DELETE)
 - ✅ New: `/api/Driver/{id}`
 
+#### User Endpoints
+**File: `app/dashboard/manager/settings/page.tsx`**
+- ❌ Old: `/user/me` (GET)
+- ✅ New: `/api/User/me`
+
+- ❌ Old: `/user/profile` (PUT)
+- ✅ New: `/api/User/profile`
+
+- ❌ Old: `/user/change-password` (POST)
+- ✅ New: `/api/User/change-password`
+
+#### Booking Endpoints
+**File: `app/dashboard/user/mybookings/page.tsx`**
+- ❌ Old: `/booking` (GET all)
+- ✅ New: `/api/Booking`
+
+- ❌ Old: `/booking/{id}/cancel` (PUT)
+- ✅ New: `/api/Booking/{id}/cancel`
+
+#### OAuth Endpoints
+**File: `app/oauth-bridge/page.tsx`**
+- ❌ Old: `/auth/oauth` (POST)
+- ✅ New: `/api/Auth/oauth`
+
 ## Files Modified
 1. `lib/auth.ts` - Authentication service
-2. `app/dashboard/user/vehicles/page.tsx` - User vehicle browsing
-3. `app/dashboard/manager/assignvehicles/page.tsx` - Vehicle management
-4. `app/dashboard/manager/assigndrivers/page.tsx` - Driver management
-5. `next.config.mjs` - Next.js configuration
-6. `ENV_SETUP.md` - Environment setup documentation
+2. `lib/api.ts` - API fetch helper (fixed base URL)
+3. `app/dashboard/user/vehicles/page.tsx` - User vehicle browsing
+4. `app/dashboard/manager/assignvehicles/page.tsx` - Vehicle management
+5. `app/dashboard/manager/assigndrivers/page.tsx` - Driver management
+6. `app/dashboard/manager/settings/page.tsx` - Manager settings
+7. `app/dashboard/user/mybookings/page.tsx` - User bookings
+8. `app/oauth-bridge/page.tsx` - OAuth authentication
+9. `next.config.mjs` - Next.js configuration
+10. `ENV_SETUP.md` - Environment setup documentation
 
 ## Next Steps
 1. Commit all changes
