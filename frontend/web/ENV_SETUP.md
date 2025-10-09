@@ -17,9 +17,11 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
 3. Click **New application setting**
 4. Add:
    - **Name**: `NEXT_PUBLIC_API_BASE_URL`
-   - **Value**: `https://your-backend-api.azurewebsites.net`
+   - **Value**: `https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net`
 5. Click **Save**
 6. **IMPORTANT**: Rebuild and redeploy your application after setting this variable
+
+**Note:** The application now has a fallback to the production API URL, so it will work even if the environment variable is not set. However, it's still recommended to set it properly in Azure for better configuration management.
 
 ## Why This Is Required
 

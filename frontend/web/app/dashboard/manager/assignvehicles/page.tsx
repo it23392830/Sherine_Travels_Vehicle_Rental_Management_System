@@ -20,7 +20,7 @@ interface Vehicle {
 }
 
 // ✅ Preferred API base from env (falls back at runtime in fetch logic)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net'
 
 export default function AssignVehiclesPage() {
   const [showDiscard, setShowDiscard] = useState(false)

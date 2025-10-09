@@ -23,7 +23,7 @@ interface Vehicle {
 }
 
 // ✅ API base from .env.local
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net'
 
 export default function AssignDriversPage() {
     const isFormEmpty = () => {

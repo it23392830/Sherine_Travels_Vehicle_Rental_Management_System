@@ -22,7 +22,7 @@ function AllVehiclesContent() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({})
   const router = useRouter()
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
   const [apiHost, setApiHost] = useState<string>("")
   const params = useSearchParams()
   const startDate = params?.get("startDate") || ""

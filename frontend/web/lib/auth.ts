@@ -14,11 +14,13 @@ export const ROLE_ROUTES: Record<UserRole, string> = {
   Owner: "/dashboard/owner",
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Fallback to production API if environment variable is not set
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
 
 // Log the API_BASE configuration on module load
 console.log('~~~~~~~~~~~~~~~~~~~~~~~[AUTH CONFIG] NEXT_PUBLIC_API_BASE_URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
 console.log('~~~~~~~~~~~~~~~~~~~~~~~[AUTH CONFIG] API_BASE value:', API_BASE);
+console.log('~~~~~~~~~~~~~~~~~~~~~~~[AUTH CONFIG] Using fallback?', !process.env.NEXT_PUBLIC_API_BASE_URL);
 
 export const AuthService = {
   getCurrentUser(): User | null {
