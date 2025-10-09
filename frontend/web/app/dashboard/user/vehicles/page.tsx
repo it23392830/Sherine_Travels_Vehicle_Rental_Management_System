@@ -27,8 +27,7 @@ function AllVehiclesContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const ENV_API_BASE = process.env.NEXT_PUBLIC_API_URL
-  const API_CANDIDATES = [ENV_API_BASE, "http://localhost:5152/api", "https://localhost:7126/api"].filter(Boolean) as string[]
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api';
   const [apiHost, setApiHost] = useState<string>("")
   const params = useSearchParams()
   const startDate = params?.get("startDate") || ""
@@ -44,37 +43,26 @@ function AllVehiclesContent() {
     const fetchVehicles = async () => {
       setLoading(true)
       setError("")
-      let lastErr: any = null
-      
-      for (const base of API_CANDIDATES) {
-        try {
-          const url = `${base}/vehicle/available?startDate=${startDate}&endDate=${endDate}`;
-          const res = await fetch(url)
-          if (!res.ok) {
-            const msg = await res.text().catch(() => "")
-            console.error("User vehicles GET failed:", base, res.status, msg)
-            lastErr = new Error(`GET failed ${res.status}`)
-            continue
-          }
-          const data: Vehicle[] = await res.json()
-          setVehicles(data)
-          setApiHost(base.replace(/\/?api$/, ""))
-          setLoading(false)
-          return
-        } catch (e) {
-          console.error("User vehicles GET network error:", base, e)
-          lastErr = e
+      try {
+        const url = `${API_BASE_URL}/api/Vehicle/available?startDate=${startDate}&endDate=${endDate}`
+        const res = await fetch(url)
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "")
+          throw new Error(`GET /vehicle/available failed: ${res.status} ${msg}`)
         }
-      }
-      
-      if (lastErr) {
+        const data: Vehicle[] = await res.json()
+        setVehicles(data)
+        setApiHost(API_BASE_URL.replace(/\/?api$/, ""))
+      } catch (err) {
+        console.error("User vehicles GET error:", err)
         setError("Failed to load vehicles. Please try again.")
+      } finally {
         setLoading(false)
       }
     }
     
     fetchVehicles()
-  }, [startDate, endDate])
+  }, [startDate, endDate, API_BASE_URL])
 
   const handlePrev = (id: number) => {
     setCurrentImageIndex(prev => ({

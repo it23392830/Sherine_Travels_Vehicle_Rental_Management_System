@@ -19,8 +19,8 @@ interface Vehicle {
   imageUrl2?: string | null
 }
 
-// ✅ Preferred API base from env (falls back at runtime in fetch logic)
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5152/api"
+// ✅ Preferred API base from env (Azure first, then local)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api'
 
 export default function AssignVehiclesPage() {
   const [showDiscard, setShowDiscard] = useState(false)
@@ -48,31 +48,19 @@ export default function AssignVehiclesPage() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const bases = [
-          API_BASE,
-          "http://localhost:5152/api",
-          "https://localhost:7126/api",
-        ].filter(Boolean) as string[]
-
-        let lastErr: any = null
-        for (const base of bases) {
-          try {
-            const res = await fetch(`${base}/vehicle`)
-            if (!res.ok) {
-              const msg = await res.text().catch(() => "")
-              console.error("GET /vehicle failed:", base, res.status, msg)
-              lastErr = new Error(`GET failed ${res.status}`)
-              continue
-            }
-            const data: Vehicle[] = await res.json()
-            setVehicles(data)
-            return
-          } catch (e) {
-            console.error("GET /vehicle network error:", base, e)
-            lastErr = e
-          }
+        const base = API_BASE_URL
+        if (!base) {
+          console.error("NEXT_PUBLIC_API_BASE_URL is not set. Please configure your environment.")
+          return
         }
-        if (lastErr) throw lastErr
+
+        const res = await fetch(`${base}/api/Vehicle`)
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "")
+          throw new Error(`GET /vehicle failed: ${res.status} ${msg}`)
+        }
+        const data: Vehicle[] = await res.json()
+        setVehicles(data)
       } catch (error) {
         console.error(error)
       }
@@ -116,7 +104,7 @@ export default function AssignVehiclesPage() {
 
       if (editingId) {
         // 🔹 Update
-        const res = await fetch(`${API_BASE}/vehicle/${editingId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/Vehicle/${editingId}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -138,7 +126,7 @@ export default function AssignVehiclesPage() {
         setSuccessMsg("Vehicle updated successfully!")
       } else {
         // 🔹 Add new
-        const res = await fetch(`${API_BASE}/vehicle`, {
+        const res = await fetch(`${API_BASE_URL}/api/Vehicle`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -256,7 +244,7 @@ export default function AssignVehiclesPage() {
   const handleDelete = async (id: number) => {
     try {
       const token = localStorage.getItem("sherine_auth_token")
-      const res = await fetch(`${API_BASE}/vehicle/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/Vehicle/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })

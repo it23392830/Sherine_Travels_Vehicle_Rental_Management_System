@@ -1,0 +1,15 @@
+backend/Sherine.Api/bin/
+backend/Sherine.Api/obj/
+frontend/web/.next/
+frontend/web/out/
+node_modules/
+frontend/web/node_modules/
+.DS_Store
+Thumbs.db
+*.log
+frontend/web/npm-debug.log*
+frontend/web/yarn-debug.log*
+frontend/web/yarn-error.log*
+*.env
+*.env.local
+frontend/web/.env*
