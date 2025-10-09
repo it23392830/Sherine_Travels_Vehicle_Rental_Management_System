@@ -39,7 +39,7 @@ function AllVehiclesContent() {
         return
       }
       try {
-        const url = `${API_BASE_URL}/vehicle/available?startDate=${startDate}&endDate=${endDate}`;
+        const url = `${API_BASE_URL}/api/Vehicle/available?startDate=${startDate}&endDate=${endDate}`;
         const res = await fetch(url)
         if (!res.ok) {
           const msg = await res.text().catch(() => "")

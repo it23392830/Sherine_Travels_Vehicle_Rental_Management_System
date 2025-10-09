@@ -54,7 +54,7 @@ export default function AssignVehiclesPage() {
           return
         }
 
-        const res = await fetch(`${base}/vehicle`)
+        const res = await fetch(`${base}/api/Vehicle`)
         if (!res.ok) {
           const msg = await res.text().catch(() => "")
           throw new Error(`GET /vehicle failed: ${res.status} ${msg}`)
@@ -104,7 +104,7 @@ export default function AssignVehiclesPage() {
 
       if (editingId) {
         // 🔹 Update
-        const res = await fetch(`${API_BASE_URL}/vehicle/${editingId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/Vehicle/${editingId}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ export default function AssignVehiclesPage() {
         setSuccessMsg("Vehicle updated successfully!")
       } else {
         // 🔹 Add new
-        const res = await fetch(`${API_BASE_URL}/vehicle`, {
+        const res = await fetch(`${API_BASE_URL}/api/Vehicle`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -232,7 +232,7 @@ export default function AssignVehiclesPage() {
   const handleDelete = async (id: number) => {
     try {
       const token = localStorage.getItem("sherine_auth_token")
-      const res = await fetch(`${API_BASE_URL}/vehicle/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/Vehicle/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })

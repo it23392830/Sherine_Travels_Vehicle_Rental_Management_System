@@ -58,7 +58,7 @@ export default function AssignDriversPage() {
         // Fetch drivers first
         let fetchedDrivers: Driver[] = []
 		try {
-			const res = await fetch(`${API_BASE}/driver`, {
+			const res = await fetch(`${API_BASE}/api/Driver`, {
 				headers: { Authorization: `Bearer ${token}` },
 			})
             if (!res.ok) throw new Error("Failed to fetch drivers")
@@ -69,7 +69,7 @@ export default function AssignDriversPage() {
         }
         // Then fetch vehicles and filter
         try {
-			const res = await fetch(`${API_BASE}/vehicle`, {
+			const res = await fetch(`${API_BASE}/api/Vehicle`, {
 				headers: { Authorization: `Bearer ${token}` },
 			})
             if (!res.ok) throw new Error("Failed to fetch vehicles")
@@ -105,7 +105,7 @@ export default function AssignDriversPage() {
             const token = localStorage.getItem("sherine_auth_token")
 			if (editingId) {
                 // 🔹 Update
-				const res = await fetch(`${API_BASE}/driver/${editingId}` , {
+				const res = await fetch(`${API_BASE}/api/Driver/${editingId}` , {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export default function AssignDriversPage() {
                 setSuccessMsg("Driver updated successfully!")
 			} else {
                 // 🔹 Add new
-				const res = await fetch(`${API_BASE}/driver`, {
+				const res = await fetch(`${API_BASE}/api/Driver`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function AssignDriversPage() {
     const handleDelete = async (id: number) => {
 		try {
             const token = localStorage.getItem("sherine_auth_token")
-			const res = await fetch(`${API_BASE}/driver/${id}`, {
+			const res = await fetch(`${API_BASE}/api/Driver/${id}`, {
                 method: "DELETE",
 				headers: { Authorization: `Bearer ${token}` },
             })
