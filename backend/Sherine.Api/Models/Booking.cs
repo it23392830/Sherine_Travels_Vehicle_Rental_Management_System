@@ -10,7 +10,9 @@ namespace Sherine.Api.Models
         public int Kilometers { get; set; }
         public bool WithDriver { get; set; }
         public decimal TotalPrice { get; set; }
+        public decimal PaidAmount { get; set; } = 0m;
         public string Status { get; set; } = "Pending"; // Pending | Confirmed | Cancelled | Completed
+        public string PaymentStatus { get; set; } = "Pending"; // Pending | Paid | PayAtPickup
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties

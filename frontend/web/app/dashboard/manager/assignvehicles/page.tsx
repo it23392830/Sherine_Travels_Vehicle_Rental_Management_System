@@ -19,8 +19,8 @@ interface Vehicle {
   imageUrl2?: string | null
 }
 
-// ✅ Preferred API base from env (falls back at runtime in fetch logic)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net'
+// ✅ Preferred API base from env (Azure first, then local)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api'
 
 export default function AssignVehiclesPage() {
   const [showDiscard, setShowDiscard] = useState(false)
@@ -98,9 +98,9 @@ export default function AssignVehiclesPage() {
   if (form.imageFile2) formData.append("ImageFile2", form.imageFile2)
 
     try {
-  setErrorMsg("")
-  const token = localStorage.getItem("sherine_auth_token")
-  console.log("Token:", token)
+      setErrorMsg("")
+      const token = localStorage.getItem("sherine_auth_token")
+      console.log("Token:", token)
 
       if (editingId) {
         // 🔹 Update
@@ -151,11 +151,23 @@ export default function AssignVehiclesPage() {
       }
 
       // reset form
-  setForm({ type: "", number: "", status: "Available", seats: "", pricePerKmWithoutDriver: "", pricePerKmWithDriver: "", priceForOvernight: "", imageUrl1: "", imageUrl2: "", imageFile1: null, imageFile2: null })
-  setErrorMsg("")
+      setForm({ 
+        type: "", 
+        number: "", 
+        status: "Available", 
+        seats: "", 
+        pricePerKmWithoutDriver: "", 
+        pricePerKmWithDriver: "", 
+        priceForOvernight: "", 
+        imageUrl1: "", 
+        imageUrl2: "", 
+        imageFile1: null, 
+        imageFile2: null 
+      })
+      setErrorMsg("")
     } catch (error) {
       console.error(error)
-    setErrorMsg("Unexpected error: " + error)
+      setErrorMsg("Unexpected error: " + error)
     }
   }
 

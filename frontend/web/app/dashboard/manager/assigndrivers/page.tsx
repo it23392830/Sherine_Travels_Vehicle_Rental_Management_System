@@ -22,8 +22,8 @@ interface Vehicle {
     status: string
 }
 
-// ✅ API base from .env.local
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net'
+// ✅ API base from env (prefer Azure, fallback to localhost)
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5152/api"
 
 export default function AssignDriversPage() {
     const isFormEmpty = () => {
