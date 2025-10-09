@@ -16,6 +16,10 @@ export const ROLE_ROUTES: Record<UserRole, string> = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Log the API_BASE configuration on module load
+console.log('[AUTH CONFIG] NEXT_PUBLIC_API_BASE_URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+console.log('[AUTH CONFIG] API_BASE value:', API_BASE);
+
 export const AuthService = {
   getCurrentUser(): User | null {
     if (typeof window !== "undefined") {
@@ -34,7 +38,11 @@ export const AuthService = {
 
   async login(email: string, password: string): Promise<User> {
     try {
+      console.log('[LOGIN] API_BASE before call:', API_BASE);
+      console.log('[LOGIN] Full URL will be:', API_BASE ? `${API_BASE}/auth/login` : 'UNDEFINED');
+      
       if (!API_BASE) {
+        console.error('[LOGIN ERROR] NEXT_PUBLIC_API_BASE_URL is not configured');
         throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
       }
       const res = await fetch(`${API_BASE}/auth/login`, {
@@ -79,7 +87,11 @@ export const AuthService = {
 
   async signup(fullName: string, email: string, password: string, userType: "User" | "Driver") {
     try {
+      console.log('[SIGNUP] API_BASE before call:', API_BASE);
+      console.log('[SIGNUP] Full URL will be:', API_BASE ? `${API_BASE}/auth/register?userType=${userType}` : 'UNDEFINED');
+      
       if (!API_BASE) {
+        console.error('[SIGNUP ERROR] NEXT_PUBLIC_API_BASE_URL is not configured');
         throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
       }
       const res = await fetch(`${API_BASE}/auth/register?userType=${userType}`, { 
