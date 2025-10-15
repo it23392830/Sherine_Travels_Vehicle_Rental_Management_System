@@ -33,6 +33,7 @@ function BookingsPageContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showChoice, setShowChoice] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [lastBooking, setLastBooking] = useState<any>(null);
   const [apiHost, setApiHost] = useState<string>("");
 
@@ -168,7 +169,12 @@ function BookingsPageContent() {
           const response = await res.json();
           console.log("Booking created successfully:", response);
           
+          // Close all modals
           setShowChoice(false);
+          setShowConfirmation(false);
+          
+          // Show success message and redirect
+          alert("Booking confirmed! You can pay at pickup. Redirecting to your bookings...");
           router.push("/dashboard/user/mybookings");
           return;
         } catch (e) {
@@ -421,7 +427,7 @@ function BookingsPageContent() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <Button 
                       variant="outline" 
-                      onClick={handlePayAtPickup} 
+                      onClick={() => setShowConfirmation(true)} 
                       disabled={loading}
                       className="w-full"
                     >
@@ -433,6 +439,55 @@ function BookingsPageContent() {
                       className="w-full"
                     >
                       Proceed to Payment
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Confirmation Dialog for Pay at Pickup */}
+            {showConfirmation && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+                <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md mx-4">
+                  <h2 className="text-2xl font-bold mb-4 text-center">Confirm Booking</h2>
+                  <p className="text-muted-foreground mb-6 text-center">
+                    Are you sure you want to confirm this booking with payment at pickup?
+                  </p>
+                  
+                  {lastBooking && (
+                    <div className="rounded-md border p-4 bg-card mb-6">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Booking ID</span>
+                        <span className="font-medium">{lastBooking.bookingId}</span>
+                      </div>
+                      <Separator className="my-3" />
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Total Amount</span>
+                        <span className="font-semibold">LKR {lastBooking.totalPrice.toLocaleString()}</span>
+                      </div>
+                      <Separator className="my-3" />
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Payment</span>
+                        <span className="font-medium text-orange-600">Pay at Pickup</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowConfirmation(false)}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      No, Cancel
+                    </Button>
+                    <Button 
+                      onClick={handlePayAtPickup} 
+                      disabled={loading}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                    >
+                      {loading ? "Processing..." : "Yes, Confirm"}
                     </Button>
                   </div>
                 </div>

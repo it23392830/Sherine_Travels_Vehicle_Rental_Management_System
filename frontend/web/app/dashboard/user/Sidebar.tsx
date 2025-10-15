@@ -44,7 +44,7 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
             My Bookings
           </Link>
           <Link
-            href="/dashboard/user/history"
+            href="/dashboard/user/booking-history"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <ClipboardList className="h-4 w-4 mr-2" />

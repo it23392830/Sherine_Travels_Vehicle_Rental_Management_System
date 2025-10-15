@@ -76,7 +76,7 @@ namespace Sherine.Api.Controllers
                 Kilometers = dto.Kilometers,
                 WithDriver = dto.WithDriver,
                 TotalPrice = totalPrice,
-                Status = string.Equals(dto.PaymentStatus, "PayAtPickup", StringComparison.OrdinalIgnoreCase) ? "Confirmed pending payment" : "Pending",
+                Status = string.Equals(dto.PaymentStatus, "PayAtPickup", StringComparison.OrdinalIgnoreCase) ? "Confirmed" : "Pending",
                 PaymentStatus = dto.PaymentStatus
             };
 
@@ -361,6 +361,38 @@ namespace Sherine.Api.Controllers
                 VehicleType = booking.Vehicle!.Type,
                 Message = "Payment recorded"
             });
+        }
+
+        // DELETE: api/Booking/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBooking(int id)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+                // Find the booking that belongs to the current user
+                var booking = await _db.Bookings
+                    .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+
+                if (booking == null)
+                    return NotFound(new { message = "Booking not found" });
+
+                // Only allow deletion of completed/paid bookings from history
+                if (booking.PaymentStatus != "PaidOnline" && booking.Status != "Completed")
+                    return BadRequest(new { message = "Only completed bookings can be deleted from history" });
+
+                // Remove the booking
+                _db.Bookings.Remove(booking);
+                await _db.SaveChangesAsync();
+
+                return Ok(new { message = "Booking deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to delete booking", error = ex.Message });
+            }
         }
     }
 }

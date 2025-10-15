@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Sherine.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPaidAmountToBooking : Migration
+    public partial class AddPaidAmountColumnToBooking : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,5 +27,3 @@ namespace Sherine.Api.Migrations
         }
     }
 }
-
-

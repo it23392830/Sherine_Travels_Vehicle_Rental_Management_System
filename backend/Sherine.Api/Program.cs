@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -66,7 +65,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy => policy.WithOrigins("http://localhost:3000", "https://ashy-glacier-0141e1700.2.azurestaticapps.net") // Add production URL
                         .AllowAnyHeader()
-                        .AllowAnyMethod());
+                        .AllowAnyMethod()
+                        .AllowCredentials());
 });
 
 var app = builder.Build();
@@ -75,7 +75,17 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate(); // Apply any pending migrations
+    
+    // Apply pending migrations
+    try
+    {
+        await db.Database.MigrateAsync();
+        Console.WriteLine("✅ Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Database migration warning: {ex.Message}");
+    }
 
     var initializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
     await initializer.SeedRolesAndAdminAsync(); // Seed roles + Owner + Manager
@@ -96,15 +106,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-// ✅ Enable CORS before authentication
-app.UseCors("AllowFrontend");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 // Serve static files for uploaded images (wwwroot)
 app.UseStaticFiles();
 
+// ✅ Correct middleware order for CORS
+app.UseRouting();
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
