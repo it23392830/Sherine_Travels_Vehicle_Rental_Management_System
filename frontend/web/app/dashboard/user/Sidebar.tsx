@@ -4,6 +4,7 @@ import { Home, Car, ClipboardList, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
 import { AuthService } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 
 interface SidebarProps {
   userRole: string
@@ -12,6 +13,42 @@ interface SidebarProps {
 
 export default function Sidebar({ userRole, userName }: SidebarProps) {
   const router = useRouter()
+  const [currentUserName, setCurrentUserName] = useState(userName)
+
+  // Load user name from localStorage and listen for updates
+  useEffect(() => {
+    const loadUserName = () => {
+      if (typeof window !== "undefined") {
+        const raw = window.localStorage.getItem("sherine_auth_user")
+        if (raw) {
+          try {
+            const user = JSON.parse(raw)
+            setCurrentUserName(user.fullName || userName)
+          } catch {
+            setCurrentUserName(userName)
+          }
+        }
+      }
+    }
+
+    // Load initially
+    loadUserName()
+
+    // Listen for storage changes (when profile is updated)
+    const handleStorageChange = () => {
+      loadUserName()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Also listen for custom event when profile is updated in same tab
+    window.addEventListener('userProfileUpdated', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('userProfileUpdated', handleStorageChange)
+    }
+  }, [userName])
 
   const handleLogout = () => {
     AuthService.logout()
@@ -61,7 +98,7 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
 
         {/* Footer User Info */}
         <div className="p-4 border-t">
-          <p className="text-sm font-medium">{userName}</p>
+          <p className="text-sm font-medium">{currentUserName}</p>
           <button
             onClick={handleLogout}
             className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2"

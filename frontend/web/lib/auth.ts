@@ -68,15 +68,37 @@ export const AuthService = {
 
       const data = await res.json();
 
+      // Store token first so we can make authenticated requests
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sherine_auth_token", data.token);
+      }
+
+      // Fetch the actual user profile to get the current full name
+      let actualFullName = email.split("@")[0]; // fallback
+      try {
+        const profileRes = await fetch(`${API_BASE}/api/User/me`, {
+          headers: { 
+            "Authorization": `Bearer ${data.token}`,
+            "Content-Type": "application/json" 
+          },
+        });
+        
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          actualFullName = profile.fullName || actualFullName;
+        }
+      } catch (error) {
+        console.log("Could not fetch user profile, using fallback name:", error);
+      }
+
       const user: User = {
         email,
-        fullName: email.split("@")[0],
+        fullName: actualFullName,
         role: (data.roles?.[0] as UserRole) ?? "User",
         token: data.token,
       };
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("sherine_auth_token", data.token);
         localStorage.setItem("sherine_auth_user", JSON.stringify(user));
       }
 
