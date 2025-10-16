@@ -27,7 +27,7 @@ function AllVehiclesContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5152';
   const [apiHost, setApiHost] = useState<string>("")
   const params = useSearchParams()
   const startDate = params?.get("startDate") || ""
@@ -133,7 +133,7 @@ function AllVehiclesContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vehicles.map(v => {
+            {vehicles.map((v: Vehicle) => {
               const idx = currentImageIndex[v.id] ?? 0
               const imageSrc = getImageForVehicle(v, idx)
               return (
@@ -151,7 +151,7 @@ function AllVehiclesContent() {
                         size="icon"
                         variant="secondary"
                         className="rounded-full"
-                        onClick={(e) => { e.stopPropagation(); handlePrev(v.id) }}
+                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); handlePrev(v.id) }}
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
@@ -159,7 +159,7 @@ function AllVehiclesContent() {
                         size="icon"
                         variant="secondary"
                         className="rounded-full"
-                        onClick={(e) => { e.stopPropagation(); handleNext(v.id) }}
+                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleNext(v.id) }}
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
