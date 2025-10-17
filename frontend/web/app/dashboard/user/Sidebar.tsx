@@ -14,9 +14,17 @@ interface SidebarProps {
 export default function Sidebar({ userRole, userName }: SidebarProps) {
   const router = useRouter()
   const [currentUserName, setCurrentUserName] = useState(userName)
+  const [isClient, setIsClient] = useState(false)
+
+  // Set client-side flag to avoid SSR hydration issues
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Load user name from localStorage and listen for updates
   useEffect(() => {
+    if (!isClient) return
+
     const loadUserName = () => {
       if (typeof window !== "undefined") {
         const raw = window.localStorage.getItem("sherine_auth_user")
@@ -48,7 +56,7 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('userProfileUpdated', handleStorageChange)
     }
-  }, [userName])
+  }, [userName, isClient])
 
   const handleLogout = () => {
     AuthService.logout()
