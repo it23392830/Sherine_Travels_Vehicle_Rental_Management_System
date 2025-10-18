@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Car, ClipboardList, Settings, LogOut } from "lucide-react"
+import { Home, Car, ClipboardList, Settings, LogOut, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { AuthService } from "@/lib/auth"
 import { useRouter } from "next/navigation"
@@ -94,6 +94,13 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
           >
             <ClipboardList className="h-4 w-4 mr-2" />
             Booking History
+          </Link>
+          <Link
+            href="/dashboard/user/chat"
+            className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Chat with us
           </Link>
           <Link
             href="/dashboard/user/settings"
