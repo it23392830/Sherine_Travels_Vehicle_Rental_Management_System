@@ -20,7 +20,7 @@ export default function OwnerDashboard() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <Sidebar userRole="Owner" userName="Owner Fernando" />
+      <Sidebar userRole="Owner" userName="Owner" />
 
       {/* Main Dashboard */}
       <div className="flex-1 md:ml-64">

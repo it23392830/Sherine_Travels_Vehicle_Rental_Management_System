@@ -5,16 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import Sidebar from "@/app/dashboard/user/Sidebar"
+import Sidebar from "@/app/dashboard/owner/Sidebar"
 import { apiFetch } from "@/lib/api"
 import { getCurrentUserName } from "@/lib/user-utils"
 
-export default function UserSettingsPage() {
+export default function OwnerSettingsPage() {
   // Check for valid auth token and redirect if missing
   useEffect(() => {
     const token = typeof window !== "undefined" ? window.localStorage.getItem("sherine_auth_token") : null;
     if (!token) {
-      alert("You must be logged in to view this page.");
+      alert("You must be logged in as an owner to view this page.");
       window.location.href = "/login";
     }
   }, []);
@@ -106,7 +106,7 @@ export default function UserSettingsPage() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar userRole="user" userName="Customer" />
+      <Sidebar userRole="owner" userName="Owner" />
       <div className="flex-1 md:ml-64 p-6">
         <h1 className="text-3xl font-bold mb-6">Settings ⚙️</h1>
 
