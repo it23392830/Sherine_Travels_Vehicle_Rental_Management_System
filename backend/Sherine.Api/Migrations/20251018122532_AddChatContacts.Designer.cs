@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Sherine.Api.Data;
@@ -11,9 +12,11 @@ using Sherine.Api.Data;
 namespace Sherine.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251018122532_AddChatContacts")]
+    partial class AddChatContacts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,7 +275,7 @@ namespace Sherine.Api.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Sherine.Api.Models.ChatContact", b =>
@@ -303,7 +306,7 @@ namespace Sherine.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChatContacts", (string)null);
+                    b.ToTable("ChatContacts");
                 });
 
             modelBuilder.Entity("Sherine.Api.Models.Driver", b =>
@@ -339,7 +342,7 @@ namespace Sherine.Api.Migrations
                         .IsUnique()
                         .HasFilter("\"VehicleId\" IS NOT NULL");
 
-                    b.ToTable("Drivers", (string)null);
+                    b.ToTable("Drivers");
                 });
 
             modelBuilder.Entity("Sherine.Api.Models.SpecialServiceRequest", b =>
@@ -387,7 +390,7 @@ namespace Sherine.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SpecialServiceRequests", (string)null);
+                    b.ToTable("SpecialServiceRequests");
                 });
 
             modelBuilder.Entity("Sherine.Api.Models.Vehicle", b =>
@@ -430,7 +433,7 @@ namespace Sherine.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vehicles", (string)null);
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

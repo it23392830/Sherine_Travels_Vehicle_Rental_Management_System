@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Sherine.Api.Models;
 
 namespace Sherine.Api.Data
@@ -8,14 +9,17 @@ namespace Sherine.Api.Data
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
 
         public DbInitializer(RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ApplicationDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _configuration = configuration;
+            _context = context;
         }
 
         public async Task SeedRolesAndAdminAsync()
@@ -69,6 +73,41 @@ namespace Sherine.Api.Data
                     await _userManager.AddToRoleAsync(manager, "Manager");
                 }
             }
+
+            // ✅ Seed Chat Contacts
+            await SeedChatContactsAsync();
+        }
+
+        private async Task SeedChatContactsAsync()
+        {
+            // Check if chat contacts already exist
+            if (await _context.ChatContacts.AnyAsync())
+            {
+                return; // Data already seeded
+            }
+
+            var chatContacts = new List<ChatContact>
+            {
+                new ChatContact
+                {
+                    Name = "Sherine Travels Manager",
+                    PhoneNumber = "+94771234567", // Replace with actual manager phone number
+                    Role = "Manager",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ChatContact
+                {
+                    Name = "Customer Support",
+                    PhoneNumber = "+94777654321", // Replace with actual support phone number
+                    Role = "Manager",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            };
+
+            _context.ChatContacts.AddRange(chatContacts);
+            await _context.SaveChangesAsync();
         }
     }
 }

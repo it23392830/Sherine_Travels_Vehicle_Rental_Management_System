@@ -12,6 +12,8 @@ namespace Sherine.Api.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<ChatContact> ChatContacts { get; set; }
+        public DbSet<SpecialServiceRequest> SpecialServiceRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
