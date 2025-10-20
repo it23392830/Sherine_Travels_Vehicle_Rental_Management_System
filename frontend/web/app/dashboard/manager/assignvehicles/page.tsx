@@ -258,7 +258,7 @@ export default function AssignVehiclesPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Assign Vehicles</h1>
+      <h1 className="text-2xl font-bold mb-6">Add a Vehicle</h1>
 
       {/* Add / Edit Form */}
       <Card className="mb-6">
@@ -365,39 +365,104 @@ export default function AssignVehiclesPage() {
         </CardContent>
       </Card>
 
-      {/* Vehicle List */}
-      <div className="grid gap-4">
-        {vehicles.map((vehicle) => (
-          <Card key={vehicle.id}>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>
-                {vehicle.type} - Seats: {vehicle.seats}
-              </CardTitle>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(vehicle)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(vehicle.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+      {/* Added Vehicles Section */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Added Vehicles</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {vehicles.map((vehicle) => (
+            <Card key={vehicle.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              {/* Vehicle Images */}
+              <div className="relative h-48 bg-gray-100">
+                {vehicle.imageUrl1 ? (
+                  <>
+                    <img 
+                      src={`${API_BASE_URL.replace('/api', '')}${vehicle.imageUrl1}`} 
+                      alt={`${vehicle.type} vehicle`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Hide the image if it fails to load and show fallback
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100" style={{display: 'none'}}>
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 rounded-full flex items-center justify-center">
+                          <span className="text-2xl">🚗</span>
+                        </div>
+                        <p className="text-gray-500 text-sm">Image not available</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 rounded-full flex items-center justify-center">
+                        <span className="text-2xl">🚗</span>
+                      </div>
+                      <p className="text-gray-500 text-sm">No image available</p>
+                    </div>
+                  </div>
+                )}
+                {/* Status Badge */}
+                <div className="absolute top-3 right-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    vehicle.status === 'Available' ? 'bg-green-100 text-green-800' :
+                    vehicle.status === 'In Service' ? 'bg-blue-100 text-blue-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {vehicle.status}
+                  </span>
+                </div>
+                {/* Action Buttons */}
+                <div className="absolute top-3 left-3 flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    className="bg-white/90 hover:bg-white"
+                    onClick={() => handleEdit(vehicle)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive" 
+                    className="bg-red-500/90 hover:bg-red-600"
+                    onClick={() => handleDelete(vehicle.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p>
-                Status: <span className="font-medium">{vehicle.status}</span>
-              </p>
-              <p>
-                Price per km (Vehicle Only): <span className="font-medium">LKR {vehicle.pricePerKmWithoutDriver.toLocaleString()}</span>
-              </p>
-              <p>
-                Price per km (Vehicle + Driver): <span className="font-medium">LKR {vehicle.pricePerKmWithDriver.toLocaleString()}</span>
-              </p>
-              <p>
-                Price for Overnights: <span className="font-medium">LKR {vehicle.priceForOvernight.toLocaleString()}</span>
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+              
+              <CardContent className="p-4">
+                <div className="mb-3">
+                  <h3 className="font-semibold text-lg text-gray-900">{vehicle.type}</h3>
+                  <p className="text-sm text-gray-600">Vehicle #{vehicle.number}</p>
+                  <div className="flex items-center mt-1">
+                    <span className="text-sm text-gray-500">👥 {vehicle.seats} seats</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600">Vehicle Only:</span>
+                    <span className="font-medium text-green-600">LKR {vehicle.pricePerKmWithoutDriver.toLocaleString()}/km</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600">With Driver:</span>
+                    <span className="font-medium text-blue-600">LKR {vehicle.pricePerKmWithDriver.toLocaleString()}/km</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600">Overnight:</span>
+                    <span className="font-medium text-purple-600">LKR {vehicle.priceForOvernight.toLocaleString()}/night</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )

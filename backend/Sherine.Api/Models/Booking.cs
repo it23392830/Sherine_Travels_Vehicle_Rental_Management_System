@@ -14,9 +14,15 @@ namespace Sherine.Api.Models
         public string Status { get; set; } = "Pending"; // Pending | Confirmed | Cancelled | Completed
         public string PaymentStatus { get; set; } = "Pending"; // Pending | Paid | PayAtPickup
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        
+        // Driver assignment fields
+        public int? DriverId { get; set; }
+        public string? DriverName { get; set; }
+        public string? DriverEmail { get; set; }
 
         // Navigation properties
         public ApplicationUser? User { get; set; }
         public Vehicle? Vehicle { get; set; }
+        public Driver? Driver { get; set; }
     }
 }
