@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Car, Users, Settings, LogOut } from "lucide-react"
+import { Home, Car, Users, Settings, LogOut, ClipboardList } from "lucide-react"
 import Link from "next/link"
 
 interface SidebarProps {
@@ -32,14 +32,21 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Car className="h-4 w-4 mr-2" />
-            Assign Vehicles
+            Add Vehicle
           </Link>
           <Link
             href="/dashboard/manager/assigndrivers"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Users className="h-4 w-4 mr-2" />
-           Assign Drivers
+           Registered Drivers
+          </Link>
+          <Link
+            href="/dashboard/manager/bookings"
+            className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
+          >
+            <ClipboardList className="h-4 w-4 mr-2" />
+            Bookings
           </Link>
           <Link
             href="/dashboard/manager/settings"
@@ -53,7 +60,13 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
         {/* Footer User Info */}
         <div className="p-4 border-t">
           <p className="text-sm font-medium">{userName}</p>
-          <button className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2">
+          <button 
+            onClick={() => {
+              localStorage.removeItem("sherine_auth_token")
+              window.location.href = "/login"
+            }}
+            className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2"
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </button>

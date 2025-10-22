@@ -32,34 +32,65 @@ namespace Sherine.Api.Controllers
         /// Only "User" and "Driver" roles are allowed for self-registration.
         /// Owner and Manager are seeded accounts (cannot self-register).
         /// </summary>
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto, [FromQuery] string userType = "User")
-        {
-            var userExists = await _userManager.FindByEmailAsync(dto.Email);
-            if (userExists != null) return BadRequest("User already exists");
+[HttpPost("register")]
+public async Task<IActionResult> Register([FromBody] RegisterDto dto, [FromQuery] string userType = "User")
+{
+    // Check if user already exists
+    var userExists = await _userManager.FindByEmailAsync(dto.Email);
+    if (userExists != null)
+        return BadRequest(new { message = "User already exists" });
 
-            var user = new ApplicationUser
+    // Create user account
+    var user = new ApplicationUser
+    {
+        Email = dto.Email,
+        UserName = dto.Email,
+        FullName = dto.FullName
+    };
+
+    var result = await _userManager.CreateAsync(user, dto.Password);
+    if (!result.Succeeded)
+        return BadRequest(result.Errors);
+
+    // Determine role: User or Driver
+    var role = (dto.Role ?? userType).Equals("Driver", StringComparison.OrdinalIgnoreCase)
+        ? "Driver"
+        : "User";
+
+    if (!await _roleManager.RoleExistsAsync(role))
+        await _roleManager.CreateAsync(new IdentityRole(role));
+
+    await _userManager.AddToRoleAsync(user, role);
+
+    // ✅ Automatically create Driver record if role is Driver
+    if (role == "Driver")
+    {
+        try
+        {
+            using var scope = HttpContext.RequestServices.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Sherine.Api.Data.ApplicationDbContext>();
+
+            var driver = new Driver
             {
-                Email = dto.Email,
-                UserName = dto.Email,
-                FullName = dto.FullName
+                Name = dto.FullName,
+                Contact = dto.Email, // or add a phone field later
+                LicenseNumber = "",
+                Status = "Available"
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) return BadRequest(result.Errors);
-
-            //  Only allow User or Driver at registration
-            var role = userType.Equals("Driver", StringComparison.OrdinalIgnoreCase) ? "Driver" : "User";
-
-            if (!await _roleManager.RoleExistsAsync(role))
-            {
-                await _roleManager.CreateAsync(new IdentityRole(role));
-            }
-
-            await _userManager.AddToRoleAsync(user, role);
-
-            return Ok(new { message = $"Account created as {role}" });
+            dbContext.Drivers.Add(driver);
+            await dbContext.SaveChangesAsync();
         }
+        catch (Exception ex)
+        {
+            // Optionally log but don't fail registration
+            Console.WriteLine($"Driver record creation failed: {ex.Message}");
+        }
+    }
+
+    return Ok(new { message = $"Account created successfully as {role}" });
+}
+
 
         /// <summary>
         /// Login with email & password. Returns JWT token and roles.

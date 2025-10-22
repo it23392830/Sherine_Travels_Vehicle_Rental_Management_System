@@ -8,7 +8,7 @@ namespace Sherine.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Manager,Owner")] // Only Manager/Owner manage drivers
+    [Authorize(Roles = "Manager,Owner")] // Managers/Owners can view driver info, but not add/delete
     public class DriverController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -18,105 +18,59 @@ namespace Sherine.Api.Controllers
             _db = db;
         }
 
-        // GET: api/Driver
+        // ✅ GET: api/Driver
+        // Used for listing all drivers (still needed for manager dashboard)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAll()
         {
             var items = await _db.Drivers
+                .Include(d => d.Vehicle)
                 .AsNoTracking()
                 .Select(d => new
                 {
                     d.Id,
-                    name = d.Name,
-                    licenseNumber = d.LicenseNumber,
-                    contact = d.Contact,
-                    status = d.Status,
-                    vehicleId = d.VehicleId
+                    d.Name,
+                    d.LicenseNumber,
+                    d.Contact,
+                    d.Status,
+                    d.VehicleId,
+                    Vehicle = d.Vehicle != null
+                        ? new { d.Vehicle.Id, d.Vehicle.Number, d.Vehicle.Type }
+                        : null
                 })
                 .ToListAsync();
 
             return Ok(items);
         }
 
-        // POST: api/Driver
+        // ❌ POST: api/Driver — Disabled
         [HttpPost]
-        public async Task<ActionResult<object>> Create([FromBody] Driver driver)
+        public IActionResult Create([FromBody] Driver driver)
         {
-            // Validate vehicle availability if assigning
-            if (driver.VehicleId.HasValue)
+            return BadRequest(new
             {
-                var vehicle = await _db.Vehicles.AsNoTracking().FirstOrDefaultAsync(v => v.Id == driver.VehicleId.Value);
-                if (vehicle == null) return BadRequest(new { message = "Vehicle not found" });
-                if (!string.Equals(vehicle.Status, "Available", StringComparison.OrdinalIgnoreCase))
-                    return BadRequest(new { message = "Vehicle is not available" });
-
-                var alreadyAssigned = await _db.Drivers.AnyAsync(d => d.VehicleId == driver.VehicleId.Value);
-                if (alreadyAssigned) return BadRequest(new { message = "Vehicle already has a driver" });
-            }
-            _db.Drivers.Add(driver);
-            await _db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                driver.Id,
-                name = driver.Name,
-                licenseNumber = driver.LicenseNumber,
-                contact = driver.Contact,
-                status = driver.Status,
-                vehicleId = driver.VehicleId
+                message = "Manual driver creation is disabled. Drivers must register via the signup page."
             });
         }
 
-        // PUT: api/Driver/{id}
+        // ❌ PUT: api/Driver/{id} — Disabled
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<object>> Update(int id, [FromBody] Driver input)
+        public IActionResult Update(int id, [FromBody] Driver driver)
         {
-            var existing = await _db.Drivers.FindAsync(id);
-            if (existing == null) return NotFound();
-
-            // Validate vehicle availability on reassignment
-            if (input.VehicleId.HasValue)
+            return BadRequest(new
             {
-                var vehicle = await _db.Vehicles.AsNoTracking().FirstOrDefaultAsync(v => v.Id == input.VehicleId.Value);
-                if (vehicle == null) return BadRequest(new { message = "Vehicle not found" });
-                if (!string.Equals(vehicle.Status, "Available", StringComparison.OrdinalIgnoreCase))
-                    return BadRequest(new { message = "Vehicle is not available" });
-
-                var assignedToOther = await _db.Drivers.AnyAsync(d => d.VehicleId == input.VehicleId.Value && d.Id != id);
-                if (assignedToOther) return BadRequest(new { message = "Vehicle already has a driver" });
-            }
-
-            existing.Name = input.Name;
-            existing.LicenseNumber = input.LicenseNumber;
-            existing.Contact = input.Contact;
-            existing.Status = input.Status;
-            existing.VehicleId = input.VehicleId;
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                existing.Id,
-                name = existing.Name,
-                licenseNumber = existing.LicenseNumber,
-                contact = existing.Contact,
-                status = existing.Status,
-                vehicleId = existing.VehicleId
+                message = "Driver updates (license, contact, etc.) are not allowed here. Drivers manage their own profiles."
             });
         }
 
-        // DELETE: api/Driver/{id}
+        // ❌ DELETE: api/Driver/{id} — Disabled
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
-            var existing = await _db.Drivers.FindAsync(id);
-            if (existing == null) return NotFound();
-
-            _db.Drivers.Remove(existing);
-            await _db.SaveChangesAsync();
-            return NoContent();
+            return BadRequest(new
+            {
+                message = "Driver deletion is restricted. Contact system admin if necessary."
+            });
         }
     }
 }
-
-
