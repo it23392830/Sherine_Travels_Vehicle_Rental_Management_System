@@ -18,7 +18,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r shadow-sm p-5 flex flex-col justify-between">
+      <aside className="w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-sm p-5 flex flex-col justify-between text-gray-900 dark:text-gray-100">
         <div>
           <h2 className="text-xl font-bold mb-8 text-green-800">Sherine Travels</h2>
           <nav className="space-y-2">
@@ -28,8 +28,8 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
                 href={item.href}
                 className={`block px-3 py-2 rounded-md transition ${
                   pathname === item.href
-                    ? "bg-green-100 text-green-700 font-semibold"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-semibold"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
                 {item.name}
@@ -39,7 +39,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
         </div>
 
         {/* Footer section */}
-        <div className="text-sm mt-6 border-t pt-4">
+        <div className="text-sm mt-6 border-t dark:border-gray-700 pt-4">
           <p className="font-medium">Manager</p>
           <Link href="/logout" className="text-red-600 hover:underline">
             Logout
@@ -48,7 +48,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 bg-gray-50 p-8 overflow-y-auto">{children}</main>
+      <main className="flex-1 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-8 overflow-y-auto">{children}</main>
     </div>
   )
 }
