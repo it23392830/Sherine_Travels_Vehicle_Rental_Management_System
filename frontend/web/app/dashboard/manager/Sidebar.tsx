@@ -60,7 +60,13 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
         {/* Footer User Info */}
         <div className="p-4 border-t">
           <p className="text-sm font-medium">{userName}</p>
-          <button className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2">
+          <button 
+            onClick={() => {
+              localStorage.removeItem("sherine_auth_token")
+              window.location.href = "/login"
+            }}
+            className="flex items-center text-sm text-muted-foreground hover:text-primary mt-2"
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </button>
