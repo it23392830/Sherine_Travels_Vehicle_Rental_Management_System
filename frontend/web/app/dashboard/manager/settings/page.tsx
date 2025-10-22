@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,37 +9,63 @@ import { Switch } from "@/components/ui/switch"
 import { apiFetch } from "@/lib/api"
 
 export default function SettingsPage() {
-  // Check for valid auth token and redirect if missing
-  useEffect(() => {
-    const token = typeof window !== "undefined" ? window.localStorage.getItem("sherine_auth_token") : null;
-    if (!token) {
-      alert("You must be logged in as a manager to view this page.");
-      window.location.href = "/login";
-    }
-  }, []);
-  const [darkMode, setDarkMode] = useState(false)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
     push: true,
   })
-
   const [profile, setProfile] = useState({ fullName: "", email: "", phoneNumber: "" })
-  const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "", confirmNewPassword: "" })
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  })
   const [loading, setLoading] = useState(false)
 
+  // ✅ Ensure token exists
+  useEffect(() => {
+    const token =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("sherine_auth_token")
+        : null
+    if (!token) {
+      alert("You must be logged in as a manager to view this page.")
+      window.location.href = "/login"
+    }
+  }, [])
+
+  // ✅ Mounted flag for hydration safety
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // ✅ Fetch profile data
   useEffect(() => {
     const load = async () => {
       try {
-        const me = await apiFetch<{ email: string; fullName: string; phoneNumber?: string }>("/api/User/me")
-        setProfile({ fullName: me.fullName, email: me.email, phoneNumber: me.phoneNumber ?? "" })
+        const me = await apiFetch<{
+          email: string
+          fullName: string
+          phoneNumber?: string
+        }>("/api/User/me")
+        setProfile({
+          fullName: me.fullName,
+          email: me.email,
+          phoneNumber: me.phoneNumber ?? "",
+        })
       } catch (e: any) {
-        // eslint-disable-next-line no-alert
         alert(`Failed to load profile: ${e?.message || "Unknown error"}`)
       }
     }
     load()
   }, [])
+
+  // ✅ Stop rendering until mounted (prevents hydration mismatch)
+  if (!mounted) return null
+
+  // ---------------------- HANDLERS ----------------------
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,22 +79,20 @@ export default function SettingsPage() {
           phoneNumber: profile.phoneNumber || undefined,
         }),
       })
-      // Persist updated name to localStorage so dashboards/sidebars reflect immediately
-      if (typeof window !== "undefined") {
-        const raw = window.localStorage.getItem("sherine_auth_user")
-        if (raw) {
-          try {
-            const user = JSON.parse(raw)
-            user.fullName = profile.fullName
-            user.email = profile.email
-            window.localStorage.setItem("sherine_auth_user", JSON.stringify(user))
-          } catch { }
-        }
+
+      // Update local storage user
+      const raw = window.localStorage.getItem("sherine_auth_user")
+      if (raw) {
+        try {
+          const user = JSON.parse(raw)
+          user.fullName = profile.fullName
+          user.email = profile.email
+          window.localStorage.setItem("sherine_auth_user", JSON.stringify(user))
+        } catch {}
       }
-      // eslint-disable-next-line no-alert
+
       alert("Profile updated successfully!")
     } catch (e: any) {
-      // eslint-disable-next-line no-alert
       alert(e?.message || "Failed to update profile")
     } finally {
       setLoading(false)
@@ -77,7 +102,6 @@ export default function SettingsPage() {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
     if (passwords.newPassword !== passwords.confirmNewPassword) {
-      // eslint-disable-next-line no-alert
       alert("New passwords do not match")
       return
     }
@@ -85,26 +109,35 @@ export default function SettingsPage() {
     try {
       await apiFetch("/api/User/change-password", {
         method: "POST",
-        body: JSON.stringify({ currentPassword: passwords.currentPassword, newPassword: passwords.newPassword }),
+        body: JSON.stringify({
+          currentPassword: passwords.currentPassword,
+          newPassword: passwords.newPassword,
+        }),
       })
-      setPasswords({ currentPassword: "", newPassword: "", confirmNewPassword: "" })
-      // eslint-disable-next-line no-alert
+      setPasswords({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      })
       alert("Password updated successfully!")
     } catch (e: any) {
-      // eslint-disable-next-line no-alert
       alert(e?.message || "Failed to update password")
     } finally {
       setLoading(false)
     }
   }
 
+  // ---------------------- UI ----------------------
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Settings ⚙️</h1>
+    <div className="p-6 transition-colors duration-300">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+        Settings ⚙️
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Section */}
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 dark:text-gray-100 transition-colors">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
             <CardDescription>Update your personal information</CardDescription>
@@ -116,7 +149,9 @@ export default function SettingsPage() {
                 <Input
                   type="text"
                   value={profile.fullName}
-                  onChange={(e) => setProfile((p) => ({ ...p, fullName: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, fullName: e.target.value }))
+                  }
                 />
               </div>
               <div>
@@ -124,7 +159,9 @@ export default function SettingsPage() {
                 <Input
                   type="email"
                   value={profile.email}
-                  onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, email: e.target.value }))
+                  }
                 />
               </div>
               <div>
@@ -132,16 +169,23 @@ export default function SettingsPage() {
                 <Input
                   type="tel"
                   value={profile.phoneNumber}
-                  onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({
+                      ...p,
+                      phoneNumber: e.target.value,
+                    }))
+                  }
                 />
               </div>
-              <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save Changes"}
+              </Button>
             </form>
           </CardContent>
         </Card>
 
         {/* Notifications Section */}
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 dark:text-gray-100 transition-colors">
           <CardHeader>
             <CardTitle>Notifications</CardTitle>
             <CardDescription>Manage how you get updates</CardDescription>
@@ -161,22 +205,29 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Dark Mode Section */}
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 dark:text-gray-100 transition-colors">
           <CardHeader>
             <CardTitle>Appearance</CardTitle>
-            <CardDescription>Choose your theme</CardDescription>
+            <CardDescription>Theme preference</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <span>Dark Mode</span>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            <div className="flex items-center justify-between gap-4">
+              <span>Theme</span>
+              <select
+                className="block rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+                value={theme ?? "system"}
+                onChange={(e) => setTheme(e.target.value as "light" | "dark" | "system")}
+              >
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System</option>
+              </select>
             </div>
           </CardContent>
         </Card>
 
         {/* Security Section */}
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 dark:text-gray-100 transition-colors">
           <CardHeader>
             <CardTitle>Security</CardTitle>
             <CardDescription>Manage your password</CardDescription>
@@ -189,7 +240,12 @@ export default function SettingsPage() {
                   type="password"
                   required
                   value={passwords.currentPassword}
-                  onChange={(e) => setPasswords((p) => ({ ...p, currentPassword: e.target.value }))}
+                  onChange={(e) =>
+                    setPasswords((p) => ({
+                      ...p,
+                      currentPassword: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
@@ -198,19 +254,33 @@ export default function SettingsPage() {
                   type="password"
                   required
                   value={passwords.newPassword}
-                  onChange={(e) => setPasswords((p) => ({ ...p, newPassword: e.target.value }))}
+                  onChange={(e) =>
+                    setPasswords((p) => ({
+                      ...p,
+                      newPassword: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Confirm New Password</label>
+                <label className="block text-sm mb-1">
+                  Confirm New Password
+                </label>
                 <Input
                   type="password"
                   required
                   value={passwords.confirmNewPassword}
-                  onChange={(e) => setPasswords((p) => ({ ...p, confirmNewPassword: e.target.value }))}
+                  onChange={(e) =>
+                    setPasswords((p) => ({
+                      ...p,
+                      confirmNewPassword: e.target.value,
+                    }))
+                  }
                 />
               </div>
-              <Button type="submit" disabled={loading}>{loading ? "Updating..." : "Update Password"}</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Updating..." : "Update Password"}
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -218,3 +288,4 @@ export default function SettingsPage() {
     </div>
   )
 }
+
