@@ -22,7 +22,7 @@ interface Vehicle {
 // ✅ Preferred API base from env (Azure first, then local)
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5152/api'
 
-export default function AssignVehiclesPage() {
+export default function AddVehiclePage() {
   const [showDiscard, setShowDiscard] = useState(false)
   const [pendingCancelAction, setPendingCancelAction] = useState<"dashboard"|"list"|null>(null)
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
