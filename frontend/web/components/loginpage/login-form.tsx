@@ -45,13 +45,8 @@ const LoginForm = () => {
         }
         try {
           await AuthService.signup(fullName, email, password, signUpRole)
-          // Auto-login after successful signup
-          const result = await login(email, password)
-          if (!result.success) {
-            const msg = result.error || "Login after signup failed."
-            setError(msg)
-            toast({ title: "Signup succeeded, login failed", description: msg })
-          }
+          toast({ title: "Account created", description: "Please sign in to continue." })
+          setIsSignUp(false)
         } catch (e: any) {
           const msg = e?.message || "Sign up failed."
           setError(msg)
