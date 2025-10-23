@@ -5,6 +5,7 @@ import Link from "next/link"
 import { AuthService } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 interface SidebarProps {
   userRole: string
@@ -67,8 +68,13 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
       <div className="flex flex-col h-full">
         {/* Logo & Header */}
         <div className="px-6 py-4 border-b">
-          <h1 className="text-xl font-bold text-primary">Sherine Travels</h1>
-          <p className="text-sm text-muted-foreground">{userRole}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-primary">Sherine Travels</h1>
+              <p className="text-sm text-muted-foreground">{userRole}</p>
+            </div>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Navigation Links */}

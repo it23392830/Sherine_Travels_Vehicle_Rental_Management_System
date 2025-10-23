@@ -96,13 +96,13 @@ export default function ManagerDashboardPage() {
   }
 
   if (loading) {
-    return <div className="p-6 text-gray-500 italic">Loading dashboard...</div>
+    return <div className="p-6 text-muted-foreground italic">Loading dashboard...</div>
   }
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-2">Manager Dashboard</h1>
-      <p className="text-gray-600 mb-6">
+      <p className="text-muted-foreground mb-6">
         Overview of fleet operations, drivers, and bookings in real-time.
       </p>
 

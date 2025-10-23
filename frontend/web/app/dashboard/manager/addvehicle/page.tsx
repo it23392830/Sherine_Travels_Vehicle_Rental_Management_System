@@ -269,23 +269,23 @@ export default function AddVehiclePage() {
         <CardContent className="space-y-3">
         {/* Discard changes popup */}
         {showDiscard && (
-          <div className="mb-2 p-3 rounded border border-neutral-300 bg-neutral-50 text-center font-medium shadow-sm flex flex-col items-center">
-            <span className="mb-3 text-base text-neutral-700">Discard changes?</span>
+          <div className="mb-2 p-3 rounded border border-border bg-muted text-center font-medium shadow-sm flex flex-col items-center">
+            <span className="mb-3 text-base text-foreground">Discard changes?</span>
             <div className="flex gap-2 justify-center">
-              <button className="px-4 py-1 rounded bg-red-100 text-red-700 font-semibold hover:bg-red-200 border border-red-300" onClick={confirmDiscard}>Yes</button>
-              <button className="px-4 py-1 rounded bg-green-100 text-green-700 font-semibold hover:bg-green-200 border border-green-300" onClick={cancelDiscard}>No</button>
+              <button className="px-4 py-1 rounded bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 font-semibold hover:bg-red-200 dark:hover:bg-red-950/50 border border-red-300 dark:border-red-800" onClick={confirmDiscard}>Yes</button>
+              <button className="px-4 py-1 rounded bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-semibold hover:bg-green-200 dark:hover:bg-green-950/50 border border-green-300 dark:border-green-800" onClick={cancelDiscard}>No</button>
             </div>
           </div>
         )}
         {/* Success message will only be shown once above the form */}
         {showSuccess && (
-          <div className="mb-2 p-2 rounded bg-green-100 text-green-700 text-center font-medium animate-fade-in">
+          <div className="mb-2 p-2 rounded bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-center font-medium animate-fade-in">
             {successMsg}
-            <button className="ml-2 text-green-900 underline" onClick={() => setShowSuccess(false)}>Close</button>
+            <button className="ml-2 text-green-900 dark:text-green-300 underline" onClick={() => setShowSuccess(false)}>Close</button>
           </div>
         )}
         {errorMsg && (
-          <div className="mb-2 p-2 rounded bg-red-100 text-red-700 text-center font-medium animate-fade-in">
+          <div className="mb-2 p-2 rounded bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-center font-medium animate-fade-in">
             {errorMsg}
           </div>
         )}
@@ -367,12 +367,12 @@ export default function AddVehiclePage() {
 
       {/* Added Vehicles Section */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Added Vehicles</h2>
+        <h2 className="text-xl font-semibold mb-4 text-foreground">Added Vehicles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vehicles.map((vehicle) => (
             <Card key={vehicle.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Vehicle Images */}
-              <div className="relative h-48 bg-gray-100">
+              <div className="relative h-48 bg-muted">
                 {vehicle.imageUrl1 ? (
                   <>
                     <img 
@@ -386,31 +386,31 @@ export default function AddVehiclePage() {
                         if (fallback) fallback.style.display = 'flex';
                       }}
                     />
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100" style={{display: 'none'}}>
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/20 dark:to-indigo-950/20" style={{display: 'none'}}>
                       <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 dark:bg-blue-800 rounded-full flex items-center justify-center">
                           <span className="text-2xl">🚗</span>
                         </div>
-                        <p className="text-gray-500 text-sm">Image not available</p>
+                        <p className="text-muted-foreground text-sm">Image not available</p>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/20 dark:to-indigo-950/20">
                     <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 rounded-full flex items-center justify-center">
+                      <div className="w-16 h-16 mx-auto mb-2 bg-blue-200 dark:bg-blue-800 rounded-full flex items-center justify-center">
                         <span className="text-2xl">🚗</span>
                       </div>
-                      <p className="text-gray-500 text-sm">No image available</p>
+                      <p className="text-muted-foreground text-sm">No image available</p>
                     </div>
                   </div>
                 )}
                 {/* Status Badge */}
                 <div className="absolute top-3 right-3">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    vehicle.status === 'Available' ? 'bg-green-100 text-green-800' :
-                    vehicle.status === 'In Service' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
+                    vehicle.status === 'Available' ? 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' :
+                    vehicle.status === 'In Service' ? 'bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-400' :
+                    'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-400'
                   }`}>
                     {vehicle.status}
                   </span>

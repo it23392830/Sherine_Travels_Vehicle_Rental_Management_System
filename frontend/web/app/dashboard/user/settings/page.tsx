@@ -33,7 +33,7 @@ export default function UserSettingsPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const me = await apiFetch<{ email: string; fullName: string; phoneNumber?: string }>("/api/User/me")
+        const me = await apiFetch<{ email: string; fullName: string; phoneNumber?: string }>("/User/me")
         setProfile({ fullName: me.fullName, email: me.email, phoneNumber: me.phoneNumber ?? "" })
       } catch (e: any) {
         // eslint-disable-next-line no-alert
@@ -47,7 +47,7 @@ export default function UserSettingsPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await apiFetch("/api/User/profile", {
+      await apiFetch("/User/profile", {
         method: "PUT",
         body: JSON.stringify({
           fullName: profile.fullName,
@@ -89,7 +89,7 @@ export default function UserSettingsPage() {
     }
     setLoading(true)
     try {
-      await apiFetch("/api/User/change-password", {
+      await apiFetch("/User/change-password", {
         method: "POST",
         body: JSON.stringify({ currentPassword: passwords.currentPassword, newPassword: passwords.newPassword }),
       })
