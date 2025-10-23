@@ -19,7 +19,6 @@ export default function OwnerSettingsPage() {
     }
   }, []);
 
-  const [darkMode, setDarkMode] = useState(false)
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
@@ -166,20 +165,6 @@ export default function OwnerSettingsPage() {
                   />
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          {/* Appearance Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>Choose your theme</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <span>Dark Mode</span>
-                <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-              </div>
             </CardContent>
           </Card>
 
