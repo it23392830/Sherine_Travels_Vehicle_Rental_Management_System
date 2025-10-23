@@ -1,7 +1,7 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -23,10 +23,11 @@ interface BookingDetails {
   vehicleNumber?: string
 }
 
-function PaymentContent() {
-  const params = useSearchParams()
+export default function BookingPaymentPage() {
+  const params = useParams()
   const router = useRouter()
-  const bookingId = params.get("bookingId")
+  const bookingId = params.bookingId as string
+  
   const [booking, setBooking] = useState<BookingDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -432,13 +433,5 @@ function PaymentContent() {
         </div>
       </div>
     </div>
-  )
-}
-
-export default function PaymentPage() {
-  return (
-    <Suspense fallback={<div className="p-6">Loading...</div>}>
-      <PaymentContent />
-    </Suspense>
   )
 }

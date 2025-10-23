@@ -82,18 +82,11 @@ export default function Sidebar({ userRole, userName }: SidebarProps) {
             User Dashboard
           </Link>
           <Link
-            href="/dashboard/user/mybookings"
+            href="/dashboard/user/bookings"
             className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
           >
             <Car className="h-4 w-4 mr-2" />
             My Bookings
-          </Link>
-          <Link
-            href="/dashboard/user/booking-history"
-            className="flex items-center px-3 py-2 rounded-lg hover:bg-muted transition"
-          >
-            <ClipboardList className="h-4 w-4 mr-2" />
-            Booking History
           </Link>
           <Link
             href="/dashboard/user/chat"
