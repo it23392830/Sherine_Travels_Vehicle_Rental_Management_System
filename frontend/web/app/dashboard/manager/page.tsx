@@ -36,20 +36,40 @@ export default function ManagerDashboardPage() {
     const token = localStorage.getItem("sherine_auth_token")
     try {
       const [resDrivers, resVehicles, resBookings] = await Promise.all([
-        fetch(`${API_BASE}/manager/drivers`, {
+        fetch(`${API_BASE}/api/Manager/drivers`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${API_BASE}/manager/vehicles`, {
+        fetch(`${API_BASE}/api/Manager/vehicles`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${API_BASE}/bookings`, {
+        fetch(`${API_BASE}/api/Manager/bookings`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ])
 
-      const dataDrivers = resDrivers.ok ? await resDrivers.json() : []
-      const dataVehicles = resVehicles.ok ? await resVehicles.json() : []
-      const dataBookings = resBookings.ok ? await resBookings.json() : []
+      const rawDrivers = resDrivers.ok ? await resDrivers.json() : []
+      const rawVehicles = resVehicles.ok ? await resVehicles.json() : []
+      const rawBookings = resBookings.ok ? await resBookings.json() : []
+
+      // Map responses (PascalCase -> camelCase)
+      const dataDrivers = (Array.isArray(rawDrivers) ? rawDrivers : []).map((d: any) => ({
+        name: d.Name ?? d.name,
+        email: d.Email ?? d.email,
+        status: d.Status ?? d.status,
+        vehicle: d.Vehicle ?? d.vehicle,
+      }))
+      const dataVehicles = (Array.isArray(rawVehicles) ? rawVehicles : []).map((v: any) => ({
+        id: v.Id ?? v.id,
+        number: v.Number ?? v.number,
+        type: v.Type ?? v.type,
+        seats: v.Seats ?? v.seats,
+        status: v.Status ?? v.status,
+      }))
+      const dataBookings = (Array.isArray(rawBookings) ? rawBookings : []).map((b: any) => ({
+        id: b.Id ?? b.id,
+        bookingId: b.BookingId ?? b.bookingId,
+        withDriver: b.WithDriver ?? b.withDriver,
+      }))
 
       // Compute dynamic stats
       const totalDrivers = dataDrivers.length
@@ -58,8 +78,9 @@ export default function ManagerDashboardPage() {
       ).length
 
       const totalVehicles = dataVehicles.length
+      // Treat Available/Active as active; exclude Booked
       const activeVehicles = dataVehicles.filter(
-        (v: any) => v.status === "Active"
+        (v: any) => (v.status === "Available" || v.status === "Active")
       ).length
 
       const totalBookings = dataBookings.length
@@ -84,8 +105,8 @@ export default function ManagerDashboardPage() {
           name: d.name,
           email: d.email,
           status: d.status,
-          vehicleNumber: d.vehicle?.number,
-          vehicleType: d.vehicle?.type,
+          vehicleNumber: d.vehicle?.Number ?? d.vehicle?.number,
+          vehicleType: d.vehicle?.Type ?? d.vehicle?.type,
         }))
       )
     } catch (err) {
