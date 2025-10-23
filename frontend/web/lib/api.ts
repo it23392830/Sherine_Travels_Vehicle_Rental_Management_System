@@ -10,7 +10,8 @@ export async function apiFetch<T = any>(
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
   const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || 'http://localhost:5152/api';
-  const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
+  const apiBase = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+  const url = path.startsWith("http") ? path : `${apiBase}${path}`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -23,6 +24,9 @@ export async function apiFetch<T = any>(
   }
 
   try {
+    // Debug logging
+    console.log("🔗 API Request:", { path, url, hasToken: !!getAuthToken() });
+    
     const res = await fetch(url, { ...options, headers });
     const isJson = res.headers.get("content-type")?.includes("application/json");
     const body = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
@@ -60,7 +64,94 @@ export async function apiFetch<T = any>(
 export const fetcher = (url: string) => apiFetch(url);
 
 export function getApiBaseUrl() {
-  return (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
+  return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+}
+
+// Booking-related types
+export interface BookingResponse {
+  id: number;
+  bookingId: string;
+  startDate: string;
+  endDate: string;
+  kilometers: number;
+  withDriver: boolean;
+  totalPrice: number;
+  paidAmount: number;
+  balanceDue: number;
+  status: string;
+  paymentStatus: string;
+  vehicleType: string;
+  message: string;
+}
+
+export interface DashboardStats {
+  upcomingBookings: BookingResponse[];
+  completedBookings: BookingResponse[];
+  pendingPayments: BookingResponse[];
+}
+
+// Booking API functions
+export async function getUserBookings(): Promise<BookingResponse[]> {
+  return apiFetch<BookingResponse[]>("/booking");
+}
+
+export async function getUserDashboardStats(): Promise<DashboardStats> {
+  const bookings = await getUserBookings();
+  
+  const now = new Date();
+  const upcomingBookings = bookings.filter(b => 
+    (b.status === "Confirmed" || b.status === "Pending") && 
+    new Date(b.startDate) >= now
+  );
+  
+  const completedBookings = bookings.filter(b => 
+    b.status === "Completed" || 
+    b.paymentStatus === "PaidOnline" ||
+    (b.paymentStatus === "Paid" && new Date(b.endDate) < now)
+  );
+  
+  const pendingPayments = bookings.filter(b => 
+    b.paymentStatus === "Pending" || 
+    (b.paymentStatus === "PayAtPickup" && b.balanceDue > 0)
+  );
+  
+  return {
+    upcomingBookings,
+    completedBookings,
+    pendingPayments
+  };
+}
+
+export async function cancelBooking(bookingId: number): Promise<void> {
+  return apiFetch(`/booking/${bookingId}/cancel`, { method: "PUT" });
+}
+
+export async function createPayPalOrder(bookingId: number, amount: number): Promise<{ orderId: string }> {
+  return apiFetch(`/booking/${bookingId}/paypal/create`, {
+    method: "POST",
+    body: JSON.stringify({ amount, currency: "PHP" })
+  });
+}
+
+export async function capturePayPalOrder(bookingId: number, orderId: string): Promise<{ message: string; status: string }> {
+  return apiFetch(`/booking/${bookingId}/paypal/capture?orderId=${orderId}`, {
+    method: "POST"
+  });
+}
+
+export async function downloadInvoice(bookingId: number): Promise<Blob> {
+  const response = await fetch(`${getApiBaseUrl()}/booking/${bookingId}/invoice`, {
+    headers: {
+      Authorization: `Bearer ${getAuthToken()}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error("Failed to download invoice");
+  }
+  
+  return response.blob();
 }
 
 
