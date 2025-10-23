@@ -34,6 +34,141 @@ function PaymentContent() {
   const [paymentStatus, setPaymentStatus] = useState("")
   const [paymentDetails, setPaymentDetails] = useState<any>(null)
 
+  const downloadInvoice = () => {
+    if (!booking) {
+      alert("Booking information not available")
+      return
+    }
+    
+    console.log("Downloading invoice for booking:", booking.bookingId)
+    console.log("Payment details:", paymentDetails)
+    
+    // Create PDF using HTML and CSS
+    const invoiceHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Invoice ${booking.bookingId}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+          .header { text-align: center; border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }
+          .company-name { font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 5px; }
+          .invoice-title { font-size: 24px; color: #666; margin-top: 10px; }
+          .invoice-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
+          .section { margin-bottom: 25px; }
+          .section-title { font-size: 18px; font-weight: bold; color: #2563eb; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; }
+          .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+          .detail-label { font-weight: 500; color: #666; }
+          .detail-value { font-weight: 600; }
+          .total-row { background-color: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px; }
+          .total-amount { font-size: 20px; font-weight: bold; color: #059669; }
+          .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; }
+          .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; background-color: #dcfce7; color: #166534; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="company-name">SHERINE TRAVELS</div>
+          <div class="invoice-title">PAYMENT INVOICE</div>
+        </div>
+        
+        <div class="invoice-info">
+          <div>
+            <strong>Invoice #:</strong> ${booking.bookingId}<br>
+            <strong>Transaction ID:</strong> ${paymentDetails?.id || paymentDetails?.orderID || 'N/A'}<br>
+            <strong>Date:</strong> ${new Date().toLocaleDateString()}
+          </div>
+          <div>
+            <span class="status-badge">Paid Online</span>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Booking Details</div>
+          <div class="detail-row">
+            <span class="detail-label">Vehicle Type:</span>
+            <span class="detail-value">${booking.vehicleType}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Start Date:</span>
+            <span class="detail-value">${new Date(booking.startDate).toLocaleDateString()}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">End Date:</span>
+            <span class="detail-value">${new Date(booking.endDate).toLocaleDateString()}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Distance:</span>
+            <span class="detail-value">${booking.kilometers} km</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Driver Required:</span>
+            <span class="detail-value">${booking.withDriver ? 'Yes' : 'No'}</span>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Payment Summary</div>
+          <div class="total-row">
+            <div class="detail-row" style="border: none; margin-bottom: 10px;">
+              <span class="detail-label">Total Amount:</span>
+              <span class="detail-value total-amount">LKR ${booking.totalPrice.toLocaleString()}</span>
+            </div>
+            <div class="detail-row" style="border: none; margin-bottom: 10px;">
+              <span class="detail-label">Amount Paid (USD):</span>
+              <span class="detail-value">$${Math.round(booking.totalPrice / 300 * 100) / 100}</span>
+            </div>
+            <div class="detail-row" style="border: none;">
+              <span class="detail-label">Payment Method:</span>
+              <span class="detail-value">PayPal</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p><strong>Thank you for choosing Sherine Travels!</strong></p>
+          <p>Contact: info@sherinetravels.com | Phone: +94 XX XXX XXXX</p>
+          <p style="font-size: 12px; color: #999;">This is a computer-generated invoice.</p>
+        </div>
+      </body>
+      </html>
+    `
+    
+    try {
+      // Create PDF using browser's print functionality
+      const printWindow = window.open('', '_blank')
+      if (printWindow) {
+        printWindow.document.write(invoiceHTML)
+        printWindow.document.close()
+        
+        // Wait for content to load, then trigger print dialog
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.print()
+            printWindow.close()
+          }, 500)
+        }
+      } else {
+        // Fallback: create downloadable HTML file
+        const blob = new Blob([invoiceHTML], { type: 'text/html;charset=utf-8' })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Invoice_${booking.bookingId}_${new Date().toISOString().split('T')[0]}.html`
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }
+      console.log("Invoice PDF generation triggered successfully")
+    } catch (error) {
+      console.error("Error generating invoice PDF:", error)
+      alert("Failed to generate invoice PDF. Please try again.")
+    }
+  }
+
   useEffect(() => {
     if (!bookingId) {
       setError("No booking ID provided")
@@ -46,7 +181,7 @@ function PaymentContent() {
         console.log("Fetching booking details for:", bookingId)
         
         // Try the booking endpoint to get real booking data
-        const bookings = await apiFetch<BookingDetails[]>("/api/Booking")
+        const bookings = await apiFetch<BookingDetails[]>("/booking")
         console.log("Booking endpoint response:", bookings)
         const foundBooking = bookings.find(b => b.bookingId === bookingId)
         if (foundBooking) {
@@ -173,7 +308,7 @@ function PaymentContent() {
 
                   <PayPalScriptProvider
                     options={{
-                      clientId: "AVs6vSPJ7iDGl8H8WbZaK0GbVg6Uu2XQ4zIbNX24BXi__fu2JsVQ1V4UENjCU6ckMIzn9Ss3Nu8D5Tw9",
+                      clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "AVs6vSPJ7iDGl8H8WbZaK0GbVg6Uu2XQ4zIbNX24BXi__fu2JsVQ1V4UENjCU6ckMIzn9Ss3Nu8D5Tw9",
                       currency: "USD",
                       intent: "capture"
                     }}
@@ -218,7 +353,7 @@ function PaymentContent() {
                           // Update booking status in backend
                           try {
                             console.log("Updating booking status for:", booking.bookingId, "Transaction:", data.orderID)
-                            const updateResponse = await apiFetch('/api/testpayment/update-booking-simple', {
+                            const updateResponse = await apiFetch('/testpayment/update-booking-simple', {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({
@@ -245,7 +380,7 @@ function PaymentContent() {
                           
                           // Redirect to bookings page
                           setTimeout(() => {
-                            router.push('/dashboard/user/mybookings')
+                            router.push('/dashboard/user/bookings')
                           }, 2000)
                           
                         } catch (error) {
@@ -273,9 +408,18 @@ function PaymentContent() {
                 {error && <p className="text-red-500 text-sm">{error}</p>}
 
                 <div className="flex gap-3">
+                  {paymentStatus === 'success' && (
+                    <Button
+                      onClick={downloadInvoice}
+                      disabled={processing}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      Download Invoice
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
-                    onClick={() => router.push("/dashboard/user/mybookings")}
+                    onClick={() => router.push("/dashboard/user/bookings")}
                     disabled={processing}
                     className="flex-1"
                   >
