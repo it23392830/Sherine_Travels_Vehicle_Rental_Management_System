@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +8,6 @@ import { Switch } from "@/components/ui/switch"
 import { apiFetch } from "@/lib/api"
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [notifications, setNotifications] = useState({
     email: true,
@@ -202,27 +200,6 @@ export default function SettingsPage() {
                 />
               </div>
             ))}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-gray-800 dark:text-gray-100 transition-colors">
-          <CardHeader>
-            <CardTitle>Appearance</CardTitle>
-            <CardDescription>Theme preference</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between gap-4">
-              <span>Theme</span>
-              <select
-                className="block rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
-                value={theme ?? "system"}
-                onChange={(e) => setTheme(e.target.value as "light" | "dark" | "system")}
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="system">System</option>
-              </select>
-            </div>
           </CardContent>
         </Card>
 
