@@ -12,7 +12,19 @@ export async function apiFetch<T = any>(
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
   const baseUrl = API_BASE + '/api';
-  const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
+  let url: string;
+  if (path.startsWith("http")) {
+    url = path;
+  } else {
+    // Normalize the provided path:
+    // - strip any protocol/host if mistakenly included
+    // - remove a leading '/api' to avoid '/api/api'
+    // - ensure it begins with a single '/'
+    let cleaned = path.replace(/^https?:\/\/[^/]+/i, "");
+    cleaned = cleaned.startsWith("/api/") ? cleaned.slice(4) : cleaned; // drop leading '/api'
+    cleaned = cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
+    url = `${baseUrl}${cleaned}`;
+  }
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
