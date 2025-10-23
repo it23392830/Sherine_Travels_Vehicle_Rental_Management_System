@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { API_BASE } from "@/lib/auth"
 
 interface Vehicle {
   id: number
@@ -28,7 +27,7 @@ function AllVehiclesContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const API_BASE_URL = API_BASE;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
   const [apiHost, setApiHost] = useState<string>("")
   const params = useSearchParams()
   const startDate = params?.get("startDate") || ""

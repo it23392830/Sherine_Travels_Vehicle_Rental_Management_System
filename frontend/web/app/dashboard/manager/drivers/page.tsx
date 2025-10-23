@@ -11,8 +11,7 @@ interface Driver {
   status: string
 }
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5152/api"
-const API_BASE = BASE.endsWith("/api") ? BASE : `${BASE}/api`
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net'
 
 export default function RegisteredDriversPage() {
   const [drivers, setDrivers] = useState<Driver[]>([])

@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Sidebar from "@/app/dashboard/user/Sidebar";
-import { API_BASE } from "@/lib/auth";
 
 interface Vehicle {
   id: number;
@@ -37,7 +36,8 @@ function BookingsPageContent() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [lastBooking, setLastBooking] = useState<any>(null);
   const [apiHost, setApiHost] = useState<string>("");
-  const API_PREFIX = `${API_BASE}/api`;
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
 
   // Fetch vehicle details
   useEffect(() => {
@@ -48,18 +48,19 @@ function BookingsPageContent() {
 
     const fetchVehicle = async () => {
       try {
-        const url = `${API_PREFIX}/vehicle/${vehicleId}`;
+        const url = `${API_BASE}/api/Vehicle/${vehicleId}`;
         const res = await fetch(url);
         if (!res.ok) {
           const msg = await res.text().catch(() => "");
-          console.error("Vehicle GET failed:", API_BASE, res.status, msg);
-          throw new Error(`GET failed ${res.status}`);
+          console.error("Vehicle GET failed:", res.status, msg);
+          setError("Failed to load vehicle details");
+          return;
         }
         const data: Vehicle = await res.json();
         setVehicle(data);
         setApiHost(API_BASE);
       } catch (e) {
-        console.error("Vehicle GET error:", e);
+        console.error("Vehicle GET network error:", e);
         setError("Failed to load vehicle details");
       }
     };
@@ -138,7 +139,7 @@ function BookingsPageContent() {
 
       // Make API call to create the booking
       try {
-        const url = `${API_PREFIX}/booking`;
+        const url = `${API_BASE}/api/Booking`;
         const res = await fetch(url, {
           method: 'POST',
           headers: {
@@ -150,8 +151,9 @@ function BookingsPageContent() {
         
         if (!res.ok) {
           const msg = await res.text().catch(() => "");
-          console.error("Booking POST failed:", API_BASE, res.status, msg);
-          throw new Error(`POST failed ${res.status}`);
+          console.error("Booking POST failed:", res.status, msg);
+          setError("Failed to create booking. Please try again.");
+          return;
         }
         
         const response = await res.json();
@@ -165,7 +167,7 @@ function BookingsPageContent() {
         alert("Booking confirmed! You can pay at pickup. Redirecting to your bookings...");
         router.push("/dashboard/user/mybookings");
       } catch (e) {
-        console.error("Booking POST error:", e);
+        console.error("Booking POST network error:", e);
         setError("Failed to create booking. Please try again.");
       }
     } catch (err) {
@@ -190,7 +192,7 @@ function BookingsPageContent() {
 
       // Make API call to create the booking
       try {
-        const url = `${API_PREFIX}/booking`;
+        const url = `${API_BASE}/api/Booking`;
         const res = await fetch(url, {
           method: 'POST',
           headers: {
@@ -202,8 +204,9 @@ function BookingsPageContent() {
         
         if (!res.ok) {
           const msg = await res.text().catch(() => "");
-          console.error("Booking POST failed:", API_BASE, res.status, msg);
-          throw new Error(`POST failed ${res.status}`);
+          console.error("Booking POST failed:", res.status, msg);
+          setError("Failed to create booking. Please try again.");
+          return;
         }
         
         const response = await res.json();
@@ -212,7 +215,7 @@ function BookingsPageContent() {
         setShowChoice(false);
         router.push(`/dashboard/user/payment?bookingId=${encodeURIComponent(response.bookingId || "")}`);
       } catch (e) {
-        console.error("Booking POST error:", e);
+        console.error("Booking POST network error:", e);
         setError("Failed to create booking. Please try again.");
       }
     } catch (err) {

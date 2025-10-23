@@ -5,26 +5,12 @@ export function getAuthToken(): string | null {
   return window.localStorage.getItem("sherine_auth_token");
 }
 
-import { API_BASE } from "./auth";
-
 export async function apiFetch<T = any>(
   path: string,
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
-  const baseUrl = API_BASE + '/api';
-  let url: string;
-  if (path.startsWith("http")) {
-    url = path;
-  } else {
-    // Normalize the provided path:
-    // - strip any protocol/host if mistakenly included
-    // - remove a leading '/api' to avoid '/api/api'
-    // - ensure it begins with a single '/'
-    let cleaned = path.replace(/^https?:\/\/[^/]+/i, "");
-    cleaned = cleaned.startsWith("/api/") ? cleaned.slice(4) : cleaned; // drop leading '/api'
-    cleaned = cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
-    url = `${baseUrl}${cleaned}`;
-  }
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
+  const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -74,7 +60,7 @@ export async function apiFetch<T = any>(
 export const fetcher = (url: string) => apiFetch(url);
 
 export function getApiBaseUrl() {
-  return (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
+  return (process.env.NEXT_PUBLIC_API_BASE_URL as string) || "https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net";
 }
 
 
