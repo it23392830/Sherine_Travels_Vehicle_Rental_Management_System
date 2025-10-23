@@ -6,10 +6,14 @@
 The base URL for your backend API.
 
 **Local Development:**
-Create a `.env.local` file in the `frontend/web` directory:
-```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
-```
+1. Copy the `env.template` file to `.env.local`:
+   ```bash
+   cp env.template .env.local
+   ```
+2. Edit `.env.local` and fill in your actual values:
+   ```
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
+   ```
 
 ### 2. Google OAuth Configuration (Required for "Sign in with Google")
 
