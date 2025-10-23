@@ -23,12 +23,18 @@ export default function RegisteredDriversPage() {
   const loadData = async () => {
     const token = localStorage.getItem("sherine_auth_token")
     try {
-      const resDrivers = await fetch(`${API_BASE}/manager/drivers`, {
+      const resDrivers = await fetch(`${API_BASE}/api/Manager/drivers`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!resDrivers.ok) throw new Error("Failed to load drivers")
       const dataDrivers = await resDrivers.json()
-      setDrivers(dataDrivers)
+      const mapped = (Array.isArray(dataDrivers) ? dataDrivers : []).map((d: any) => ({
+        id: d.Id ?? d.id,
+        name: d.Name ?? d.name,
+        email: d.Email ?? d.email,
+        status: d.Status ?? d.status ?? "Available",
+      }))
+      setDrivers(mapped)
     } catch (err) {
       console.error(err)
     }
