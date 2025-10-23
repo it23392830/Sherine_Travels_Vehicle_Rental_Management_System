@@ -9,7 +9,7 @@ export async function apiFetch<T = any>(
   path: string,
   options: RequestInit & { method?: HttpMethod } = {}
 ): Promise<T> {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || 'http://localhost:5152/api';
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || 'https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net';
   const apiBase = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
   const url = path.startsWith("http") ? path : `${apiBase}${path}`;
 
@@ -64,7 +64,7 @@ export async function apiFetch<T = any>(
 export const fetcher = (url: string) => apiFetch(url);
 
 export function getApiBaseUrl() {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || "http://localhost:5152/api";
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL as string) || (process.env.NEXT_PUBLIC_API_URL as string) || "https://sherinetravels-api-frcsb2d3drabgbbd.eastasia-01.azurewebsites.net";
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 }
 
@@ -153,5 +153,3 @@ export async function downloadInvoice(bookingId: number): Promise<Blob> {
   
   return response.blob();
 }
-
-
