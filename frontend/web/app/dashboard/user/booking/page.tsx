@@ -175,7 +175,7 @@ function BookingsPageContent() {
           
           // Show success message and redirect
           alert("Booking confirmed! You can pay at pickup. Redirecting to your bookings...");
-          router.push("/dashboard/user/mybookings");
+          router.push("/dashboard/user/bookings");
           return;
         } catch (e) {
           console.error("Booking POST network error:", base, e);
