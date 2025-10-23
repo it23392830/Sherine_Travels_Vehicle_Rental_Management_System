@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { AuthProvider } from "../hooks/use-auth"
 import { AppSessionProvider } from "@/components/auth/session-provider"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
@@ -16,15 +17,21 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      
+    <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning={true}>
-        <AppSessionProvider>
-          <AuthProvider>
-            {children}
-            <Toaster richColors position="top-right" />
-          </AuthProvider>
-        </AppSessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AppSessionProvider>
+            <AuthProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </AuthProvider>
+          </AppSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

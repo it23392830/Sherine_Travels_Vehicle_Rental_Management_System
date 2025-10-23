@@ -62,14 +62,14 @@ export default function DriverDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
-                    <AlertCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                  <div className="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">Maintenance Due</p>
                       <p className="text-xs text-muted-foreground">Vehicle XYZ-456 needs service in 2 days</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                  <div className="flex items-start space-x-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                     <CheckCircle className="h-4 w-4 text-primary mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">Vehicle Ready</p>

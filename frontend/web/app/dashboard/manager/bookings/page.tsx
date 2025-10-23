@@ -188,26 +188,26 @@ export default function BookingsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Confirmed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400"
       case "Pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-400"
       case "Cancelled":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-400"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-muted text-muted-foreground"
     }
   }
 
   const getPaymentStatusColor = (paymentStatus: string) => {
     switch (paymentStatus) {
       case "PaidOnline":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400"
       case "Pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-400"
       case "PayAtPickup":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-400"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-muted text-muted-foreground"
     }
   }
 

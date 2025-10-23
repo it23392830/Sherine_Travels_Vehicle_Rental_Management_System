@@ -49,7 +49,7 @@ export default function SettingsPage() {
           email: string
           fullName: string
           phoneNumber?: string
-        }>("/api/User/me")
+        }>("/User/me")
         setProfile({
           fullName: me.fullName,
           email: me.email,
@@ -71,7 +71,7 @@ export default function SettingsPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await apiFetch("/api/User/profile", {
+      await apiFetch("/User/profile", {
         method: "PUT",
         body: JSON.stringify({
           fullName: profile.fullName,
@@ -107,7 +107,7 @@ export default function SettingsPage() {
     }
     setLoading(true)
     try {
-      await apiFetch("/api/User/change-password", {
+      await apiFetch("/User/change-password", {
         method: "POST",
         body: JSON.stringify({
           currentPassword: passwords.currentPassword,

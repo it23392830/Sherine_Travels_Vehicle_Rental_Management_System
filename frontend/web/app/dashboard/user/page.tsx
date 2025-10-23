@@ -69,14 +69,14 @@ export default function UserDashboard() {
     if (status === "Pending") return <Badge className="bg-yellow-600">Pending</Badge>
     if (status === "Completed") return <Badge className="bg-blue-600">Completed</Badge>
     if (status === "Cancelled") return <Badge className="bg-red-600">Cancelled</Badge>
-    return <Badge className="bg-gray-600">{status}</Badge>
+    return <Badge className="bg-muted text-muted-foreground">{status}</Badge>
   }
 
   const getPaymentBadge = (paymentStatus: string) => {
     if (paymentStatus === "Paid") return <Badge className="bg-green-600">Paid</Badge>
     if (paymentStatus === "Pending") return <Badge className="bg-yellow-600">Pending</Badge>
     if (paymentStatus === "PayAtPickup") return <Badge className="bg-orange-600">Pay at Pickup</Badge>
-    return <Badge className="bg-gray-600">{paymentStatus}</Badge>
+    return <Badge className="bg-muted text-muted-foreground">{paymentStatus}</Badge>
   }
 
   if (loading) {

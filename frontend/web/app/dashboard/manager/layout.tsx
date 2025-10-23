@@ -3,6 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -20,7 +21,10 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-700 shadow-sm p-5 flex flex-col justify-between text-gray-900 dark:text-gray-100">
         <div>
-          <h2 className="text-xl font-bold mb-8 text-green-800">Sherine Travels</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold text-green-800">Sherine Travels</h2>
+            <ThemeToggle />
+          </div>
           <nav className="space-y-2">
             {navItems.map((item) => (
               <Link
