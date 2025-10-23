@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Sidebar from "@/app/dashboard/user/Sidebar";
+import { API_BASE } from "@/lib/auth";
 
 interface Vehicle {
   id: number;
@@ -36,9 +37,7 @@ function BookingsPageContent() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [lastBooking, setLastBooking] = useState<any>(null);
   const [apiHost, setApiHost] = useState<string>("");
-
-  const ENV_API_BASE = process.env.NEXT_PUBLIC_API_URL;
-  const API_CANDIDATES = [ENV_API_BASE, "http://localhost:5152/api", "https://localhost:7126/api"].filter(Boolean) as string[];
+  const API_PREFIX = `${API_BASE}/api`;
 
   // Fetch vehicle details
   useEffect(() => {
@@ -48,27 +47,19 @@ function BookingsPageContent() {
     }
 
     const fetchVehicle = async () => {
-      let lastErr: any = null;
-      for (const base of API_CANDIDATES) {
-        try {
-          const url = `${base}/vehicle/${vehicleId}`;
-          const res = await fetch(url);
-          if (!res.ok) {
-            const msg = await res.text().catch(() => "");
-            console.error("Vehicle GET failed:", base, res.status, msg);
-            lastErr = new Error(`GET failed ${res.status}`);
-            continue;
-          }
-          const data: Vehicle = await res.json();
-          setVehicle(data);
-          setApiHost(base.replace(/\/?api$/, ""));
-          return;
-        } catch (e) {
-          console.error("Vehicle GET network error:", base, e);
-          lastErr = e;
+      try {
+        const url = `${API_PREFIX}/vehicle/${vehicleId}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "");
+          console.error("Vehicle GET failed:", API_BASE, res.status, msg);
+          throw new Error(`GET failed ${res.status}`);
         }
-      }
-      if (lastErr) {
+        const data: Vehicle = await res.json();
+        setVehicle(data);
+        setApiHost(API_BASE);
+      } catch (e) {
+        console.error("Vehicle GET error:", e);
         setError("Failed to load vehicle details");
       }
     };
@@ -146,44 +137,35 @@ function BookingsPageContent() {
       };
 
       // Make API call to create the booking
-      let lastErr: any = null;
-      for (const base of API_CANDIDATES) {
-        try {
-          const url = `${base}/booking`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('sherine_auth_token')}`
-            },
-            body: JSON.stringify(bookingData)
-          });
-          
-          if (!res.ok) {
-            const msg = await res.text().catch(() => "");
-            console.error("Booking POST failed:", base, res.status, msg);
-            lastErr = new Error(`POST failed ${res.status}`);
-            continue;
-          }
-          
-          const response = await res.json();
-          console.log("Booking created successfully:", response);
-          
-          // Close all modals
-          setShowChoice(false);
-          setShowConfirmation(false);
-          
-          // Show success message and redirect
-          alert("Booking confirmed! You can pay at pickup. Redirecting to your bookings...");
-          router.push("/dashboard/user/mybookings");
-          return;
-        } catch (e) {
-          console.error("Booking POST network error:", base, e);
-          lastErr = e;
+      try {
+        const url = `${API_PREFIX}/booking`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('sherine_auth_token')}`
+          },
+          body: JSON.stringify(bookingData)
+        });
+        
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "");
+          console.error("Booking POST failed:", API_BASE, res.status, msg);
+          throw new Error(`POST failed ${res.status}`);
         }
-      }
-      
-      if (lastErr) {
+        
+        const response = await res.json();
+        console.log("Booking created successfully:", response);
+        
+        // Close all modals
+        setShowChoice(false);
+        setShowConfirmation(false);
+        
+        // Show success message and redirect
+        alert("Booking confirmed! You can pay at pickup. Redirecting to your bookings...");
+        router.push("/dashboard/user/mybookings");
+      } catch (e) {
+        console.error("Booking POST error:", e);
         setError("Failed to create booking. Please try again.");
       }
     } catch (err) {
@@ -207,39 +189,30 @@ function BookingsPageContent() {
       };
 
       // Make API call to create the booking
-      let lastErr: any = null;
-      for (const base of API_CANDIDATES) {
-        try {
-          const url = `${base}/booking`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('sherine_auth_token')}`
-            },
-            body: JSON.stringify(bookingData)
-          });
-          
-          if (!res.ok) {
-            const msg = await res.text().catch(() => "");
-            console.error("Booking POST failed:", base, res.status, msg);
-            lastErr = new Error(`POST failed ${res.status}`);
-            continue;
-          }
-          
-          const response = await res.json();
-          console.log("Booking created successfully:", response);
-          
-          setShowChoice(false);
-          router.push(`/dashboard/user/payment?bookingId=${encodeURIComponent(response.bookingId || "")}`);
-          return;
-        } catch (e) {
-          console.error("Booking POST network error:", base, e);
-          lastErr = e;
+      try {
+        const url = `${API_PREFIX}/booking`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('sherine_auth_token')}`
+          },
+          body: JSON.stringify(bookingData)
+        });
+        
+        if (!res.ok) {
+          const msg = await res.text().catch(() => "");
+          console.error("Booking POST failed:", API_BASE, res.status, msg);
+          throw new Error(`POST failed ${res.status}`);
         }
-      }
-      
-      if (lastErr) {
+        
+        const response = await res.json();
+        console.log("Booking created successfully:", response);
+        
+        setShowChoice(false);
+        router.push(`/dashboard/user/payment?bookingId=${encodeURIComponent(response.bookingId || "")}`);
+      } catch (e) {
+        console.error("Booking POST error:", e);
         setError("Failed to create booking. Please try again.");
       }
     } catch (err) {
