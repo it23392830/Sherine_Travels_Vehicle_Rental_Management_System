@@ -53,11 +53,11 @@ export default function BookingsPage() {
     }
     
     try {
-      console.log("Loading bookings from:", `${API_BASE}/manager/bookings`)
+      console.log("Loading bookings from:", `${API_BASE}/api/Manager/bookings`)
       console.log("Using token:", token.substring(0, 20) + "...")
       
       // Load bookings
-      const resBookings = await fetch(`${API_BASE}/manager/bookings`, {
+      const resBookings = await fetch(`${API_BASE}/api/Manager/bookings`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       
@@ -70,10 +70,28 @@ export default function BookingsPage() {
       }
       const dataBookings = await resBookings.json()
       console.log("Bookings loaded:", dataBookings.length, "items")
-      setBookings(dataBookings)
+      const mappedBookings = (Array.isArray(dataBookings) ? dataBookings : []).map((b: any) => ({
+        id: b.Id ?? b.id,
+        bookingId: b.BookingId ?? b.bookingId,
+        vehicleId: b.VehicleId ?? b.vehicleId,
+        vehicleType: b.VehicleType ?? b.vehicleType,
+        startDate: b.StartDate ?? b.startDate,
+        endDate: b.EndDate ?? b.endDate,
+        kilometers: b.Kilometers ?? b.kilometers,
+        totalPrice: b.TotalPrice ?? b.totalPrice,
+        status: b.Status ?? b.status,
+        paymentStatus: b.PaymentStatus ?? b.paymentStatus,
+        withDriver: b.WithDriver ?? b.withDriver,
+        driverId: b.DriverId ?? b.driverId,
+        driverName: b.DriverName ?? b.driverName,
+        driverEmail: b.DriverEmail ?? b.driverEmail,
+        userName: b.UserName ?? b.userName,
+        userEmail: b.UserEmail ?? b.userEmail,
+      }))
+      setBookings(mappedBookings)
 
       // Load drivers
-      const resDrivers = await fetch(`${API_BASE}/manager/drivers`, {
+      const resDrivers = await fetch(`${API_BASE}/api/Manager/drivers`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!resDrivers.ok) {
@@ -95,7 +113,7 @@ export default function BookingsPage() {
   const handleAssignDriver = async (bookingId: number, driverId: string) => {
     const token = localStorage.getItem("sherine_auth_token")
     try {
-      const res = await fetch(`${API_BASE}/manager/assign-driver-to-booking`, {
+      const res = await fetch(`${API_BASE}/api/Manager/assign-driver-to-booking`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +138,7 @@ export default function BookingsPage() {
   const handleChangeDriver = async (bookingId: number, driverId: string) => {
     const token = localStorage.getItem("sherine_auth_token")
     try {
-      const res = await fetch(`${API_BASE}/manager/change-driver-for-booking`, {
+      const res = await fetch(`${API_BASE}/api/Manager/change-driver-for-booking`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,7 +163,7 @@ export default function BookingsPage() {
   const handleUnassignDriver = async (bookingId: number) => {
     const token = localStorage.getItem("sherine_auth_token")
     try {
-      const res = await fetch(`${API_BASE}/manager/unassign-driver-from-booking`, {
+      const res = await fetch(`${API_BASE}/api/Manager/unassign-driver-from-booking`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
