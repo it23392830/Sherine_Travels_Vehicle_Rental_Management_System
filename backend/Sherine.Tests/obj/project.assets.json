@@ -491,10 +491,10 @@
           }
         }
       },
-      "Selenium.Support/4.37.0": {
+      "Selenium.Support/4.38.0": {
         "type": "package",
         "dependencies": {
-          "Selenium.WebDriver": "4.37.0"
+          "Selenium.WebDriver": "4.38.0"
         },
         "compile": {
           "lib/netstandard2.0/WebDriver.Support.dll": {
@@ -507,7 +507,7 @@
           }
         }
       },
-      "Selenium.WebDriver/4.37.0": {
+      "Selenium.WebDriver/4.38.0": {
         "type": "package",
         "compile": {
           "lib/net8.0/WebDriver.dll": {
@@ -1345,24 +1345,24 @@
         "packageIcon.png"
       ]
     },
-    "Selenium.Support/4.37.0": {
-      "sha512": "92122sne3RrSyTXtzKNfm7gcg717ptGzm8fIUcr3WX1hF2Hk+m/TS9wcw1gsDlW0XLbetY4NkNL5HT4K4VTDMg==",
+    "Selenium.Support/4.38.0": {
+      "sha512": "FBxJRTpXZePi/gbBAf7RzN147sd6vo/TEaxQzxd7NbSxJCbTI2zu0wLmwnv3mmJAWrFDwjknJq0mB6s0b94jIA==",
       "type": "package",
-      "path": "selenium.support/4.37.0",
+      "path": "selenium.support/4.38.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "icon.png",
         "lib/netstandard2.0/WebDriver.Support.dll",
         "lib/netstandard2.0/WebDriver.Support.xml",
-        "selenium.support.4.37.0.nupkg.sha512",
+        "selenium.support.4.38.0.nupkg.sha512",
         "selenium.support.nuspec"
       ]
     },
-    "Selenium.WebDriver/4.37.0": {
-      "sha512": "0YDBx1Ck+m5ZKw1eoE70Dj1e2zZ/g4piaBhztwz2mcilJDU4h1Q2PLfQP5LwMYMqG4QhW/TatxkZZtIY/q2baA==",
+    "Selenium.WebDriver/4.38.0": {
+      "sha512": "3cYBndxLgPifEttQ1+k+KhKp2XBTdME3pUp4PC/eHb/hvHsefeT2WN2JJymzs+5mkqaXUp64FBnj2EG/Iyrh/A==",
       "type": "package",
-      "path": "selenium.webdriver/4.37.0",
+      "path": "selenium.webdriver/4.38.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1377,7 +1377,7 @@
         "runtimes/linux/native/selenium-manager",
         "runtimes/osx/native/selenium-manager",
         "runtimes/win/native/selenium-manager.exe",
-        "selenium.webdriver.4.37.0.nupkg.sha512",
+        "selenium.webdriver.4.38.0.nupkg.sha512",
         "selenium.webdriver.nuspec"
       ]
     },
@@ -1685,8 +1685,8 @@
       "Microsoft.Extensions.Configuration.Binder >= 8.0.0",
       "Microsoft.Extensions.Configuration.Json >= 8.0.0",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
-      "Selenium.Support >= 4.37.0",
-      "Selenium.WebDriver >= 4.37.0",
+      "Selenium.Support >= 4.38.0",
+      "Selenium.WebDriver >= 4.38.0",
       "Selenium.WebDriver.ChromeDriver >= 141.0.7390.5400",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",
@@ -1762,11 +1762,11 @@
           },
           "Selenium.Support": {
             "target": "Package",
-            "version": "[4.37.0, )"
+            "version": "[4.38.0, )"
           },
           "Selenium.WebDriver": {
             "target": "Package",
-            "version": "[4.37.0, )"
+            "version": "[4.38.0, )"
           },
           "Selenium.WebDriver.ChromeDriver": {
             "target": "Package",

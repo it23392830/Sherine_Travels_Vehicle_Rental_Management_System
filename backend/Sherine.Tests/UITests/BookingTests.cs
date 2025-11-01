@@ -58,7 +58,7 @@ public class BookingTests
 
         // 8. Verify the booking was successful
         var alert = wait.Until(d => d.SwitchTo().Alert());
-        Assert.Contains("Booking confirmed", alert.Text);
+        Assert.Contains("Booking confirmed! You can pay at pickup. Redirecting to your bookings...", alert.Text);
         alert.Accept();
     }
 }

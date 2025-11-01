@@ -21,6 +21,7 @@ public class ManagerTests
         _fixture.Login("Manager");
 
         // 2. Wait for the dashboard to load by checking for the header
+        System.Threading.Thread.Sleep(5000);
         var wait = new WebDriverWait(_fixture.Driver, TimeSpan.FromSeconds(30));
         var dashboardHeader = wait.Until(d => d.FindElement(By.CssSelector("[data-testid='manager-dashboard-header']")));
         Assert.Equal("Manager Dashboard", dashboardHeader.Text);
@@ -38,7 +39,6 @@ public class ManagerTests
         _fixture.WaitForElement(By.CssSelector("[data-testid='vehicle-type-input']")).Clear();
         _fixture.WaitForElement(By.CssSelector("[data-testid='vehicle-type-input']")).SendKeys(updatedVehicleType);
         _fixture.WaitForElement(By.CssSelector("[data-testid='add-update-vehicle-button']")).Click();
-        System.Threading.Thread.Sleep(500); // Add a small delay to allow the UI to update
         var successMessage = _fixture.WaitForElementVisible(By.CssSelector("[data-testid='success-message']"), 15);
         Assert.Contains("Vehicle updated successfully!", successMessage.Text);
 

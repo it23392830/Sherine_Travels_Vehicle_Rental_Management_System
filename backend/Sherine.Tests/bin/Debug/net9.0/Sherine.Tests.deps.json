@@ -12,8 +12,8 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.0",
           "Microsoft.Extensions.Configuration.Json": "8.0.0",
           "Microsoft.NET.Test.Sdk": "17.12.0",
-          "Selenium.Support": "4.37.0",
-          "Selenium.WebDriver": "4.37.0",
+          "Selenium.Support": "4.38.0",
+          "Selenium.WebDriver": "4.38.0",
           "Selenium.WebDriver.ChromeDriver": "141.0.7390.5400",
           "coverlet.collector": "6.0.2",
           "xunit": "2.9.2",
@@ -26,7 +26,7 @@
       "coverlet.collector/6.0.2": {},
       "DotNetSeleniumExtras.WaitHelpers/3.11.0": {
         "dependencies": {
-          "Selenium.WebDriver": "4.37.0"
+          "Selenium.WebDriver": "4.38.0"
         },
         "runtime": {
           "lib/netstandard2.0/SeleniumExtras.WaitHelpers.dll": {
@@ -407,9 +407,9 @@
           }
         }
       },
-      "Selenium.Support/4.37.0": {
+      "Selenium.Support/4.38.0": {
         "dependencies": {
-          "Selenium.WebDriver": "4.37.0"
+          "Selenium.WebDriver": "4.38.0"
         },
         "runtime": {
           "lib/netstandard2.0/WebDriver.Support.dll": {
@@ -418,7 +418,7 @@
           }
         }
       },
-      "Selenium.WebDriver/4.37.0": {
+      "Selenium.WebDriver/4.38.0": {
         "runtime": {
           "lib/net8.0/WebDriver.dll": {
             "assemblyVersion": "4.0.0.0",
@@ -624,19 +624,19 @@
       "path": "newtonsoft.json/13.0.1",
       "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
     },
-    "Selenium.Support/4.37.0": {
+    "Selenium.Support/4.38.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-92122sne3RrSyTXtzKNfm7gcg717ptGzm8fIUcr3WX1hF2Hk+m/TS9wcw1gsDlW0XLbetY4NkNL5HT4K4VTDMg==",
-      "path": "selenium.support/4.37.0",
-      "hashPath": "selenium.support.4.37.0.nupkg.sha512"
+      "sha512": "sha512-FBxJRTpXZePi/gbBAf7RzN147sd6vo/TEaxQzxd7NbSxJCbTI2zu0wLmwnv3mmJAWrFDwjknJq0mB6s0b94jIA==",
+      "path": "selenium.support/4.38.0",
+      "hashPath": "selenium.support.4.38.0.nupkg.sha512"
     },
-    "Selenium.WebDriver/4.37.0": {
+    "Selenium.WebDriver/4.38.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0YDBx1Ck+m5ZKw1eoE70Dj1e2zZ/g4piaBhztwz2mcilJDU4h1Q2PLfQP5LwMYMqG4QhW/TatxkZZtIY/q2baA==",
-      "path": "selenium.webdriver/4.37.0",
-      "hashPath": "selenium.webdriver.4.37.0.nupkg.sha512"
+      "sha512": "sha512-3cYBndxLgPifEttQ1+k+KhKp2XBTdME3pUp4PC/eHb/hvHsefeT2WN2JJymzs+5mkqaXUp64FBnj2EG/Iyrh/A==",
+      "path": "selenium.webdriver/4.38.0",
+      "hashPath": "selenium.webdriver.4.38.0.nupkg.sha512"
     },
     "Selenium.WebDriver.ChromeDriver/141.0.7390.5400": {
       "type": "package",
