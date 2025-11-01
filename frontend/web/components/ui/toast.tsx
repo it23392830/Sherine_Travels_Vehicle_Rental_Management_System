@@ -50,6 +50,7 @@ const Toast = React.forwardRef<
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
       {...props}
+      data-testid={`toast-${variant}`}
     />
   )
 })
@@ -96,6 +97,7 @@ const ToastTitle = React.forwardRef<
     ref={ref}
     className={cn("text-sm font-semibold", className)}
     {...props}
+    data-testid="toast-title"
   />
 ))
 ToastTitle.displayName = ToastPrimitives.Title.displayName

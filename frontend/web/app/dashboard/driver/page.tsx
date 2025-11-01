@@ -12,7 +12,7 @@ export default function DriverDashboard() {
       <div className="flex-1 md:ml-64">
         <div className="p-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Driver Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="driver-dashboard-header">Driver Dashboard</h1>
             <p className="text-muted-foreground">Track your assigned rides and update ride statuses</p>
           </div>
 

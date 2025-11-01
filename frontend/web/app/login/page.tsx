@@ -37,9 +37,9 @@ export default function LoginPage() {
       // Redirect based on role (roles is an array)
       const userRoles = data.roles || []
       if (userRoles.includes("Manager") || userRoles.includes("Owner")) {
-        router.push("/dashboard/manager")
+        window.location.href = "/dashboard/manager";
       } else {
-        router.push("/dashboard")
+        window.location.href = "/dashboard";
       }
     } catch (err: any) {
       setError(err.message || "Login failed")

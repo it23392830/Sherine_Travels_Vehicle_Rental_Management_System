@@ -137,7 +137,7 @@ function AllVehiclesContent() {
               const idx = currentImageIndex[v.id] ?? 0
               const imageSrc = getImageForVehicle(v, idx)
               return (
-                <Card key={v.id} className="overflow-hidden group cursor-pointer" onClick={() => goToBooking(v.id)}>
+                <Card key={v.id} className="overflow-hidden group cursor-pointer" onClick={() => goToBooking(v.id)} data-testid={`vehicle-card-${v.id}`}>
                   <div className="relative aspect-[16/10] bg-muted">
                     {/* Image */}
                     <img
@@ -201,6 +201,7 @@ function AllVehiclesContent() {
                           e.stopPropagation();
                           goToBooking(v.id);
                         }}
+                        data-testid={`select-vehicle-button-${v.id}`}
                       >
                         Select This Vehicle
                       </Button>

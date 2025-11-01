@@ -103,7 +103,7 @@ export default function UserDashboard() {
       <div className="flex-1 md:ml-64">
         <div className="p-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">User Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="client-dashboard-header">User Dashboard</h1>
             <p className="text-muted-foreground">View bookings, payment status, and ride history</p>
           </div>
 

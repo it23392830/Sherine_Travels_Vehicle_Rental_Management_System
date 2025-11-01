@@ -35,6 +35,7 @@ namespace Sherine.Api.Data
             // ✅ Seed Owner (Super Admin)
             var ownerEmail = _configuration["SeedAdmin:Email"] ?? "owner@example.com";
             var ownerPassword = _configuration["SeedAdmin:Password"] ?? "Owner@123";
+            Console.WriteLine($"Seeding Owner: {ownerEmail}");
 
             var owner = await _userManager.FindByEmailAsync(ownerEmail);
             if (owner == null)
@@ -56,6 +57,7 @@ namespace Sherine.Api.Data
             // ✅ Seed Manager (Admin)
             var managerEmail = _configuration["SeedManager:Email"] ?? "manager@example.com";
             var managerPassword = _configuration["SeedManager:Password"] ?? "Manager@123";
+            Console.WriteLine($"Seeding Manager: {managerEmail}");
 
             var manager = await _userManager.FindByEmailAsync(managerEmail);
             if (manager == null)
@@ -72,6 +74,61 @@ namespace Sherine.Api.Data
                 {
                     await _userManager.AddToRoleAsync(manager, "Manager");
                 }
+            }
+
+            // ✅ Seed Driver
+            var driverEmail = _configuration["SeedDriver:Email"] ?? "driver@example.com";
+            var driverPassword = _configuration["SeedDriver:Password"] ?? "Driver@123";
+            Console.WriteLine($"Seeding Driver: {driverEmail}");
+
+            var driver = await _userManager.FindByEmailAsync(driverEmail);
+            if (driver == null)
+            {
+                driver = new ApplicationUser
+                {
+                    Email = driverEmail,
+                    UserName = driverEmail,
+                    FullName = "Test Driver"
+                };
+
+                var result = await _userManager.CreateAsync(driver, driverPassword);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(driver, "Driver");
+                }
+            }
+
+            // ✅ Seed Client
+            var clientEmail = _configuration["SeedClient:Email"] ?? "client@example.com";
+            var clientPassword = _configuration["SeedClient:Password"] ?? "Client@123";
+            Console.WriteLine($"Seeding Client: {clientEmail}");
+
+            var client = await _userManager.FindByEmailAsync(clientEmail);
+            if (client == null)
+            {
+                client = new ApplicationUser
+                {
+                    Email = clientEmail,
+                    UserName = clientEmail,
+                    FullName = "Test Client"
+                };
+
+                var result = await _userManager.CreateAsync(client, clientPassword);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(client, "User");
+                }
+            }
+
+            // ✅ Seed Vehicles
+            if (!_context.Vehicles.Any())
+            {
+                _context.Vehicles.AddRange(
+                    new Vehicle { Type = "Car", Number = "V001", Seats = 4, PricePerKmWithDriver = 100, PricePerKmWithoutDriver = 80, PriceForOvernight = 2000, Status = "Available" },
+                    new Vehicle { Type = "Van", Number = "V002", Seats = 8, PricePerKmWithDriver = 150, PricePerKmWithoutDriver = 120, PriceForOvernight = 3000, Status = "Available" },
+                    new Vehicle { Type = "Bus", Number = "V003", Seats = 20, PricePerKmWithDriver = 200, PricePerKmWithoutDriver = 150, PriceForOvernight = 4000, Status = "Available" }
+                );
+                await _context.SaveChangesAsync();
             }
 
             // ✅ Seed Chat Contacts

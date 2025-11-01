@@ -69,6 +69,8 @@ export default function AddVehiclePage() {
   }, [])
 
   const handleAddOrUpdate = async () => {
+    setShowSuccess(false)
+    setSuccessMsg("")
   console.log("Form values:", JSON.stringify(form, null, 2))
   if (
   !form.type.trim() ||
@@ -279,7 +281,7 @@ export default function AddVehiclePage() {
         )}
         {/* Success message will only be shown once above the form */}
         {showSuccess && (
-          <div className="mb-2 p-2 rounded bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-center font-medium animate-fade-in">
+          <div className="mb-2 p-2 rounded bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-center font-medium animate-fade-in" data-testid="success-message">
             {successMsg}
             <button className="ml-2 text-green-900 dark:text-green-300 underline" onClick={() => setShowSuccess(false)}>Close</button>
           </div>
@@ -293,11 +295,13 @@ export default function AddVehiclePage() {
             placeholder="Vehicle Type"
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value })}
+            data-testid="vehicle-type-input"
           />
           <Input
             placeholder="Vehicle Number"
             value={form.number}
             onChange={(e) => setForm({ ...form, number: e.target.value })}
+            data-testid="vehicle-number-input"
           />
           <Input
             type="number"
@@ -305,6 +309,7 @@ export default function AddVehiclePage() {
             placeholder="Seats"
             value={form.seats}
             onChange={(e) => setForm({ ...form, seats: e.target.value })}
+            data-testid="seats-input"
           />
           <Input
             type="number"
@@ -312,6 +317,7 @@ export default function AddVehiclePage() {
             placeholder="Price per km (Vehicle Only)"
             value={form.pricePerKmWithoutDriver}
             onChange={(e) => setForm({ ...form, pricePerKmWithoutDriver: e.target.value })}
+            data-testid="price-per-km-without-driver-input"
           />
           <Input
             type="number"
@@ -319,6 +325,7 @@ export default function AddVehiclePage() {
             placeholder="Price per km (Vehicle + Driver)"
             value={form.pricePerKmWithDriver}
             onChange={(e) => setForm({ ...form, pricePerKmWithDriver: e.target.value })}
+            data-testid="price-per-km-with-driver-input"
           />
           <Input
             type="number"
@@ -326,6 +333,7 @@ export default function AddVehiclePage() {
             placeholder="Price for Overnights (LKR)"
             value={form.priceForOvernight}
             onChange={(e) => setForm({ ...form, priceForOvernight: e.target.value })}
+            data-testid="price-for-overnight-input"
           />
           {/* Removed Image URL inputs as requested */}
           <div className="flex gap-3">
@@ -353,7 +361,7 @@ export default function AddVehiclePage() {
 
           <div className="flex gap-3 w-full mt-2">
             <div className="flex gap-3 justify-center w-full">
-              <Button onClick={handleAddOrUpdate} className="min-w-[110px] px-4 py-1 flex items-center justify-center gap-2 text-base font-semibold text-white rounded-full bg-green-600 hover:bg-green-700 transition-all">
+              <Button onClick={handleAddOrUpdate} className="min-w-[110px] px-4 py-1 flex items-center justify-center gap-2 text-base font-semibold text-white rounded-full bg-green-600 hover:bg-green-700 transition-all" data-testid="add-update-vehicle-button">
                 <PlusCircle className="h-4 w-4" />
                 {editingId ? "Update Vehicle" : "Add Vehicle"}
               </Button>

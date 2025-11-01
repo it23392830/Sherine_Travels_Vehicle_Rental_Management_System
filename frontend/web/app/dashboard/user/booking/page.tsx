@@ -294,11 +294,11 @@ function BookingsPageContent() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-muted-foreground">Start Date:</span>
-                  <span className="ml-2 font-medium">{new Date(startDate).toLocaleDateString()}</span>
+                  <span className="ml-2 font-medium" data-testid="start-date-input">{new Date(startDate).toLocaleDateString()}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">End Date:</span>
-                  <span className="ml-2 font-medium">{new Date(endDate).toLocaleDateString()}</span>
+                  <span className="ml-2 font-medium" data-testid="end-date-input">{new Date(endDate).toLocaleDateString()}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Number of Nights:</span>
@@ -323,6 +323,7 @@ function BookingsPageContent() {
                   className="w-full border-2 border-neutral-400 rounded p-2 focus:border-primary focus:outline-none"
                   min="1"
                   required
+                  data-testid="kilometers-input"
                 />
               </div>
               
@@ -332,6 +333,7 @@ function BookingsPageContent() {
                   id="withDriver"
                   checked={withDriver}
                   onChange={() => setWithDriver(!withDriver)}
+                  data-testid="with-driver-checkbox"
                 />
                 <label htmlFor="withDriver" className="text-sm font-medium">With Driver</label>
               </div>
@@ -346,6 +348,7 @@ function BookingsPageContent() {
                     className="w-full border-2 border-neutral-400 rounded p-2 focus:border-primary focus:outline-none"
                     placeholder="Enter pickup address"
                     required={withDriver}
+                    data-testid="pickup-address-input"
                   />
                 </div>
               )}
@@ -374,6 +377,7 @@ function BookingsPageContent() {
                 type="submit" 
                 disabled={loading || !km} 
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg py-3 text-lg shadow transition mt-6"
+                data-testid="proceed-to-payment-button"
               >
                 {loading ? "Processing..." : "Proceed to Payment"}
               </Button>
@@ -406,6 +410,7 @@ function BookingsPageContent() {
                       onClick={() => setShowConfirmation(true)} 
                       disabled={loading}
                       className="w-full"
+                      data-testid="pay-at-pickup-button"
                     >
                       Pay at Pickup
                     </Button>
@@ -413,6 +418,7 @@ function BookingsPageContent() {
                       onClick={handleProceedToPayment} 
                       disabled={loading}
                       className="w-full"
+                      data-testid="proceed-to-payment-modal-button"
                     >
                       Proceed to Payment
                     </Button>
@@ -455,6 +461,7 @@ function BookingsPageContent() {
                       onClick={() => setShowConfirmation(false)}
                       disabled={loading}
                       className="w-full"
+                      data-testid="cancel-confirmation-button"
                     >
                       No, Cancel
                     </Button>
@@ -462,6 +469,7 @@ function BookingsPageContent() {
                       onClick={handlePayAtPickup} 
                       disabled={loading}
                       className="w-full bg-green-600 hover:bg-green-700"
+                      data-testid="confirm-pay-at-pickup-button"
                     >
                       {loading ? "Processing..." : "Yes, Confirm"}
                     </Button>

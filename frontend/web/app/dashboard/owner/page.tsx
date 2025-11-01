@@ -294,7 +294,7 @@ export default function OwnerDashboard() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Owner Dashboard</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="owner-dashboard-header">Owner Dashboard</h1>
                 <p className="text-muted-foreground">Monitor finances, fleet, drivers, and overall operations</p>
                 {lastUpdated && (
                   <p className="text-xs text-muted-foreground mt-1">

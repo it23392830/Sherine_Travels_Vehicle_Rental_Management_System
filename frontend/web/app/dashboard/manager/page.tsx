@@ -122,7 +122,7 @@ export default function ManagerDashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-2">Manager Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-2" data-testid="manager-dashboard-header">Manager Dashboard</h1>
       <p className="text-muted-foreground mb-6">
         Overview of fleet operations, drivers, and bookings in real-time.
       </p>

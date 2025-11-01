@@ -74,6 +74,7 @@ const LoginForm = () => {
   }
 
   const toggleMode = () => {
+    console.log('Toggling mode. Current isSignUp:', isSignUp);
     setIsSignUp(!isSignUp)
     setEmail('')
     setPassword('')
@@ -87,6 +88,7 @@ const LoginForm = () => {
     console.log("Google sign-up button clicked - no redirect configured")
   }
 
+  console.log('Rendering form. isSignUp:', isSignUp);
   return (
     <>
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 p-4 relative overflow-hidden">
@@ -291,6 +293,7 @@ const LoginForm = () => {
                       className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white outline-none transition-all duration-300 text-gray-800"
                       placeholder="Enter your full name"
                       required
+                      data-testid="full-name-input"
                     />
                   </div>
                 </div>
@@ -307,6 +310,7 @@ const LoginForm = () => {
                     className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white outline-none transition-all duration-300 text-gray-800"
                     placeholder="Enter your email"
                     required
+                    data-testid="email-input"
                   />
                 </div>
               </div>
@@ -322,6 +326,7 @@ const LoginForm = () => {
                     className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white outline-none transition-all duration-300 text-gray-800"
                     placeholder="Enter your password"
                     required
+                    data-testid="password-input"
                   />
                   <button
                     type="button"
@@ -346,6 +351,7 @@ const LoginForm = () => {
                         className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white outline-none transition-all duration-300 text-gray-800"
                         placeholder="Confirm your password"
                         required
+                        data-testid="confirm-password-input"
                       />
                       <button
                         type="button"
@@ -368,6 +374,7 @@ const LoginForm = () => {
                           checked={signUpRole === "User"}
                           onChange={() => setSignUpRole("User")}
                           className="text-blue-600"
+                          data-testid="role-radio-user"
                         />
                         User
                       </label>
@@ -379,6 +386,7 @@ const LoginForm = () => {
                           checked={signUpRole === "Driver"}
                           onChange={() => setSignUpRole("Driver")}
                           className="text-blue-600"
+                          data-testid="role-radio-driver"
                         />
                         Driver
                       </label>
@@ -389,18 +397,19 @@ const LoginForm = () => {
 
               {!isSignUp && (
                 <div className="flex items-center justify-end">
-                  <button type="button" className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-300">
+                  <button type="button" className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-300" data-testid="forgot-password-button">
                     Forgot password?
                   </button>
                 </div>
               )}
 
-              {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+              {error && <div className="text-red-500 text-sm mb-2" data-testid="error-message">{error}</div>}
 
               <button
                 type="submit"
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
+                data-testid="submit-button"
               >
                 {isLoading ? (
                   <>
@@ -431,6 +440,7 @@ const LoginForm = () => {
                     type="button"
                     onClick={handleGoogleSignIn}
                     className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 font-medium py-3.5 rounded-xl transition-all duration-300 hover:shadow-md"
+                    data-testid="google-sign-in-button"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -459,6 +469,7 @@ const LoginForm = () => {
                   type="button"
                   onClick={toggleMode}
                   className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-300"
+                  data-testid="toggle-mode-button"
                 >
                   {isSignUp ? 'Sign in to existing account' : 'Create an account'}
                   <ArrowRight className="w-4 h-4" />
