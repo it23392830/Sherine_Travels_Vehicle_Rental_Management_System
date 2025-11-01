@@ -25,10 +25,11 @@ public class WebDriverFixture : IDisposable
 
         var solutionDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName;
         var driverPath = Path.Combine(solutionDir, "chromedriver.exe");
+
         Driver = new ChromeDriver(Path.GetDirectoryName(driverPath));
     }
 
-        public IWebElement WaitForElement(By locator, int seconds = 30)
+    public IWebElement WaitForElement(By locator, int seconds = 30)
     {
         var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(seconds));
         return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
@@ -51,6 +52,16 @@ public class WebDriverFixture : IDisposable
         emailField.SendKeys(user.Email);
         passwordField.SendKeys(user.Password);
         loginButton.Click();
+
+        var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+        if (userType == "Manager" || userType == "Owner")
+        {
+            wait.Until(d => d.Url.Contains("/dashboard/manager"));
+        }
+        else
+        {
+            wait.Until(d => d.Url.Contains("/dashboard/user"));
+        }
     }
 
     public void CreateVehicle(string vehicleType, string vehicleNumber)
@@ -64,6 +75,12 @@ public class WebDriverFixture : IDisposable
         WaitForElement(By.CssSelector("[data-testid='price-for-overnight-input']")).SendKeys("2500");
         WaitForElement(By.CssSelector("[data-testid='add-update-vehicle-button']")).Click();
         WaitForElementVisible(By.CssSelector("[data-testid='success-message']"), 15);
+    }
+
+    public void Reset()
+    {
+        Driver.Manage().Cookies.DeleteAllCookies();
+        Driver.Navigate().GoToUrl(Settings.BaseUrl);
     }
 
     public void Dispose()

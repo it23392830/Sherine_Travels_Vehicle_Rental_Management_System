@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sherine.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e204033c31d334e8f683a6c432d794cffbd0445")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+770f25fea4c16d0960d9a6f85f15f56f55c7fa38")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sherine.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sherine.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

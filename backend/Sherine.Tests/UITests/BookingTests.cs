@@ -1,17 +1,15 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Sherine.Tests.UITests;
 
 [Collection("UI Tests")]
-public class BookingTests
+public class BookingTests : UITestBase
 {
-    private readonly WebDriverFixture _fixture;
-
-    public BookingTests(WebDriverFixture fixture)
+    public BookingTests(WebDriverFixture fixture, ITestOutputHelper output) : base(fixture, output)
     {
-        _fixture = fixture;
     }
 
     [Fact]
@@ -50,10 +48,13 @@ public class BookingTests
         ((IJavaScriptExecutor)_fixture.Driver).ExecuteScript("arguments[0].click();", proceedToPaymentButton);
 
         // 7. Confirm payment
-        var payAtPickupButton = wait.Until(d => d.FindElement(By.CssSelector("[data-testid='pay-at-pickup-button']")));
+        // Wait for the payment choice modal to appear
+        _fixture.WaitForElementVisible(By.XPath("//h2[text()='Booking Created']"));
+
+        var payAtPickupButton = _fixture.WaitForElementVisible(By.CssSelector("[data-testid='pay-at-pickup-button']"));
         payAtPickupButton.Click();
 
-        var confirmPayAtPickupButton = wait.Until(d => d.FindElement(By.CssSelector("[data-testid='confirm-pay-at-pickup-button']")));
+        var confirmPayAtPickupButton = _fixture.WaitForElementVisible(By.CssSelector("[data-testid='confirm-pay-at-pickup-button']"));
         confirmPayAtPickupButton.Click();
 
         // 8. Verify the booking was successful

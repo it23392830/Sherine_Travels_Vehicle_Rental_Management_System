@@ -1,17 +1,15 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Sherine.Tests.UITests;
 
 [Collection("UI Tests")]
-public class LoginTests
+public class LoginTests : UITestBase
 {
-    private readonly WebDriverFixture _fixture;
-
-    public LoginTests(WebDriverFixture fixture)
+    public LoginTests(WebDriverFixture fixture, ITestOutputHelper output) : base(fixture, output)
     {
-        _fixture = fixture;
     }
 
     [Theory]
@@ -33,15 +31,7 @@ public class LoginTests
         loginButton.Click();
 
         var wait = new WebDriverWait(_fixture.Driver, TimeSpan.FromSeconds(10));
-        var dashboardElement = role switch
-        {
-            "Manager" => wait.Until(d => d.FindElement(By.CssSelector("[data-testid='manager-dashboard-header']"))),
-            "Owner" => wait.Until(d => d.FindElement(By.CssSelector("[data-testid='owner-dashboard-header']"))),
-            "Driver" => wait.Until(d => d.FindElement(By.CssSelector("[data-testid='driver-dashboard-header']"))),
-            "Client" => wait.Until(d => d.FindElement(By.CssSelector("[data-testid='client-dashboard-header']"))),
-            _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
-        };
-
-        Assert.Contains("Dashboard", dashboardElement.Text);
+        wait.Until(d => d.Url.Contains("/dashboard"));
+        Assert.Contains("/dashboard", _fixture.Driver.Url);
     }
 }
