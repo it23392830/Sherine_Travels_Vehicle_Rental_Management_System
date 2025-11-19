@@ -65,7 +65,7 @@ These are used by `azure/login@v2` for federated (OIDC) authentication to Azure;
 
 - Branches
   - `main`: protected; only fast-forward merges via approved PRs; deploys to Production via workflows
-  - `dev`: integration branch; optional pre-prod builds or preview environments (if added later)
+  - `dev`: integration branch; optional pre-prod builds or preview environments
   - `feat/<feature-name>`: feature branches; open PRs into `dev` or `main`
 - Pull Requests
   - Require passing CI checks (build succeeds) before merge
