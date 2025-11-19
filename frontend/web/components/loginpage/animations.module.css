@@ -1,0 +1,178 @@
+@keyframes drive-right {
+  0% {
+    left: -100px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes drive-right-delayed {
+  0% {
+    left: -100px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes drive-left {
+  0% {
+    right: -100px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    right: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes drive-left-delayed {
+  0% {
+    right: -100px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    right: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes cloud-float {
+  0%, 100% { 
+    transform: translateX(0); 
+  }
+  50% { 
+    transform: translateX(50px); 
+  }
+}
+
+@keyframes cloud-float-slow {
+  0%, 100% { 
+    transform: translateX(0); 
+  }
+  50% { 
+    transform: translateX(-40px); 
+  }
+}
+
+@keyframes sun-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.9; 
+  }
+  50% { 
+    transform: scale(1.1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes tree-sway {
+  0%, 100% { 
+    transform: rotate(-3deg); 
+  }
+  50% { 
+    transform: rotate(3deg); 
+  }
+}
+
+@keyframes tree-sway-delayed {
+  0%, 100% { 
+    transform: rotate(3deg); 
+  }
+  50% { 
+    transform: rotate(-3deg); 
+  }
+}
+
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes fade-in-delayed {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+.animateDriveRight {
+  animation: drive-right 12s linear infinite;
+}
+
+.animateDriveRightDelayed {
+  animation: drive-right-delayed 15s linear infinite;
+  animation-delay: 4s;
+}
+
+.animateDriveLeft {
+  animation: drive-left 14s linear infinite;
+}
+
+.animateDriveLeftDelayed {
+  animation: drive-left-delayed 16s linear infinite;
+  animation-delay: 5s;
+}
+
+.animateCloudFloat {
+  animation: cloud-float 20s ease-in-out infinite;
+}
+
+.animateCloudFloatSlow {
+  animation: cloud-float-slow 25s ease-in-out infinite;
+}
+
+.animateSunPulse {
+  animation: sun-pulse 4s ease-in-out infinite;
+}
+
+.animateTreeSway {
+  animation: tree-sway 4s ease-in-out infinite;
+}
+
+.animateTreeSwayDelayed {
+  animation: tree-sway-delayed 5s ease-in-out infinite;
+}
+
+.animateFadeIn {
+  animation: fade-in 2s ease-out;
+}
+
+.animateFadeInDelayed {
+  animation: fade-in-delayed 2s ease-out 0.5s both;
+}
